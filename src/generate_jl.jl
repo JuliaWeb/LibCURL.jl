@@ -17,6 +17,41 @@ wrap_hdrs = map( x-> joinpath("/usr/include/curl", x), [ "curl.h", "easy.h", "mu
 wc = wrap_c.init(".", "lC_common_h.jl", clang_includes, clang_extraargs, (th, h) -> contains(wrap_hdrs, h) , h -> ":libcurl", h -> "./lC_" * replace(last(split(h, "/")), ".", "_")  * ".jl" )
 wrap_c.wrap_c_headers(wc, ["/usr/include/curl/curl.h"])
 
+# generate export statements.....
+fe = open("lC_exports_h.jl", "w+")
+println(fe, "#   Generating exports")
+
+fc = open("lC_curl_h.jl", "r")
+curljl = split(readall(fc), "\n")
+close(fc)
+
+for e in curljl
+  m = match(r"^\s*\@c\s+[\w\:\{\}\_]+\s+(\w+)", e)
+  if (m != nothing) 
+#    println (m.captures[1])
+    @printf fe "export %s\n"  m.captures[1]
+  end
+end
+
+fc = open("lC_common_h.jl", "r")
+curljl = split(readall(fc), "\n")
+close(fc)
+
+for e in curljl
+  m = match(r"^\s*\@ctypedef\s+(\w+)", e)
+  if (m != nothing) 
+#    println(m.captures[1])
+    @printf fe "export %s\n"  m.captures[1]
+  else 
+    m = match(r"^\s*const\s+(\w+)", e)
+    if (m != nothing) 
+#        println(m.captures[1])
+        @printf fe "export %s\n"  m.captures[1]
+    end
+  end
+end
+
+
 
 # #defines generated
 const ign_defs = [
@@ -46,9 +81,11 @@ for e in hashdefs
   if (m != nothing) && !contains(ign_defs, strip(m.captures[1]))
     c2 = replace (m.captures[2], "(unsigned long)", "") 
     @printf f "const CURL%-30s = %s\n"  m.captures[1]  c2
+    @printf fe "export CURL%s\n"  m.captures[1]
   end
 end
 
 close(f)
+close(fe)
 
 
