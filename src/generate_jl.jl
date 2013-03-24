@@ -14,7 +14,7 @@ clang_extraargs = ["-D", "__STDC_LIMIT_MACROS", "-D", "__STDC_CONSTANT_MACROS"]
 
 wrap_hdrs = map( x-> joinpath("/usr/include/curl", x), [ "curl.h", "easy.h", "multi.h" ])
 
-wc = wrap_c.init(".", "lC_common_h.jl", clang_includes, clang_extraargs, (th, h) -> contains(wrap_hdrs, h) , h -> ":libcurl", h -> "./lC_" * replace(last(split(h, "/")), ".", "_")  * ".jl" )
+wc = wrap_c.init(".", "lC_common_h.jl", clang_includes, clang_extraargs, (th, h) -> contains(wrap_hdrs, h) , h -> "libcurl", h -> "./lC_" * replace(last(split(h, "/")), ".", "_")  * ".jl" )
 wrap_c.wrap_c_headers(wc, ["/usr/include/curl/curl.h"])
 
 # generate export statements.....

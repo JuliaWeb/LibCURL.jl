@@ -1,18 +1,11 @@
-
-recurs_sym_type(ex::Any) = 
-  (ex==None || typeof(ex)==Symbol || length(ex.args)==1) ? eval(ex) : Expr(ex.head, ex.args[1], recurs_sym_type(ex.args[2]))
 macro c(ret_type, func, arg_types, lib)
-  local _arg_types = Expr(:tuple, [recurs_sym_type(a) for a in arg_types.args]...)
-  local _ret_type = recurs_sym_type(ret_type)
-  local _args_in = Any[ symbol(string('a',x)) for x in 1:length(_arg_types.args) ]
-  local _lib = eval(lib)
+  local args_in = Any[ symbol(string('a',x)) for x in 1:length(arg_types.args) ]
   quote
-    $(esc(func))($(_args_in...)) = ccall( ($(string(func)), $(Expr(:quote, _lib)) ), $_ret_type, $_arg_types, $(_args_in...) )
+    $(esc(func))($(args_in...)) = ccall( ($(string(func)), $(Expr(:quote, lib)) ), $ret_type, $arg_types, $(args_in...) )
   end
 end
 
 macro ctypedef(fake_t,real_t)
-  real_t = recurs_sym_type(real_t)
   quote
     typealias $fake_t $real_t
   end
@@ -20,8 +13,8 @@ end
 
 @ctypedef CURL None
 @ctypedef curl_socket_t Int32
-@ctypedef curl_progress_callback Ptr{:Void}
-@ctypedef curl_write_callback Ptr{:Void}
+@ctypedef curl_progress_callback Ptr{Void}
+@ctypedef curl_write_callback Ptr{Void}
 # enum curlfiletype
 const CURLFILETYPE_FILE = 0
 const CURLFILETYPE_DIRECTORY = 1
@@ -34,19 +27,19 @@ const CURLFILETYPE_DOOR = 7
 const CURLFILETYPE_UNKNOWN = 8
 # end
 @ctypedef curlfiletype Int32
-@ctypedef curl_chunk_bgn_callback Ptr{:Void}
-@ctypedef curl_chunk_end_callback Ptr{:Void}
-@ctypedef curl_fnmatch_callback Ptr{:Void}
-@ctypedef curl_seek_callback Ptr{:Void}
-@ctypedef curl_read_callback Ptr{:Void}
+@ctypedef curl_chunk_bgn_callback Ptr{Void}
+@ctypedef curl_chunk_end_callback Ptr{Void}
+@ctypedef curl_fnmatch_callback Ptr{Void}
+@ctypedef curl_seek_callback Ptr{Void}
+@ctypedef curl_read_callback Ptr{Void}
 # enum curlsocktype
 const CURLSOCKTYPE_IPCXN = 0
 const CURLSOCKTYPE_LAST = 1
 # end
 @ctypedef curlsocktype Int32
-@ctypedef curl_sockopt_callback Ptr{:Void}
-@ctypedef curl_opensocket_callback Ptr{:Void}
-@ctypedef curl_closesocket_callback Ptr{:Void}
+@ctypedef curl_sockopt_callback Ptr{Void}
+@ctypedef curl_opensocket_callback Ptr{Void}
+@ctypedef curl_closesocket_callback Ptr{Void}
 # enum curlioerr
 const CURLIOE_OK = 0
 const CURLIOE_UNKNOWNCMD = 1
@@ -60,12 +53,12 @@ const CURLIOCMD_RESTARTREAD = 1
 const CURLIOCMD_LAST = 2
 # end
 @ctypedef curliocmd Int32
-@ctypedef curl_ioctl_callback Ptr{:Void}
-@ctypedef curl_malloc_callback Ptr{:Void}
-@ctypedef curl_free_callback Ptr{:Void}
-@ctypedef curl_realloc_callback Ptr{:Void}
-@ctypedef curl_strdup_callback Ptr{:Void}
-@ctypedef curl_calloc_callback Ptr{:Void}
+@ctypedef curl_ioctl_callback Ptr{Void}
+@ctypedef curl_malloc_callback Ptr{Void}
+@ctypedef curl_free_callback Ptr{Void}
+@ctypedef curl_realloc_callback Ptr{Void}
+@ctypedef curl_strdup_callback Ptr{Void}
+@ctypedef curl_calloc_callback Ptr{Void}
 # enum curl_infotype
 const CURLINFO_TEXT = 0
 const CURLINFO_HEADER_IN = 1
@@ -77,7 +70,7 @@ const CURLINFO_SSL_DATA_OUT = 6
 const CURLINFO_END = 7
 # end
 @ctypedef curl_infotype Int32
-@ctypedef curl_debug_callback Ptr{:Void}
+@ctypedef curl_debug_callback Ptr{Void}
 # enum CURLcode
 const CURLE_OK = 0
 const CURLE_UNSUPPORTED_PROTOCOL = 1
@@ -171,8 +164,8 @@ const CURLE_CHUNK_FAILED = 88
 const CURL_LAST = 89
 # end
 @ctypedef CURLcode Int32
-@ctypedef curl_conv_callback Ptr{:Void}
-@ctypedef curl_ssl_ctx_callback Ptr{:Void}
+@ctypedef curl_conv_callback Ptr{Void}
+@ctypedef curl_ssl_ctx_callback Ptr{Void}
 # enum curl_proxytype
 const CURLPROXY_HTTP = 0
 const CURLPROXY_HTTP_1_0 = 1
@@ -195,7 +188,7 @@ const CURLKHMATCH_MISMATCH = 1
 const CURLKHMATCH_MISSING = 2
 const CURLKHMATCH_LAST = 3
 # end
-@ctypedef curl_sshkeycallback Ptr{:Void}
+@ctypedef curl_sshkeycallback Ptr{Void}
 # enum curl_usessl
 const CURLUSESSL_NONE = 0
 const CURLUSESSL_TRY = 1
@@ -457,12 +450,23 @@ const CURL_RTSPREQ_RECORD = 10
 const CURL_RTSPREQ_RECEIVE = 11
 const CURL_RTSPREQ_LAST = 12
 # end
+# enum CURL_NETRC_OPTION
+const CURL_NETRC_IGNORED = 0
+const CURL_NETRC_OPTIONAL = 1
+const CURL_NETRC_REQUIRED = 2
+const CURL_NETRC_LAST = 3
+# end
 # enum CURL_TLSAUTH
 const CURL_SSLVERSION_DEFAULT = 0
 const CURL_SSLVERSION_TLSv1 = 1
 const CURL_SSLVERSION_SSLv2 = 2
 const CURL_SSLVERSION_SSLv3 = 3
 const CURL_SSLVERSION_LAST = 4
+# end
+# enum CURL_TLSAUTH
+const CURL_TLSAUTH_NONE = 0
+const CURL_TLSAUTH_SRP = 1
+const CURL_TLSAUTH_LAST = 2
 # end
 # enum curl_TimeCond
 const CURL_TIMECOND_NONE = 0
@@ -508,7 +512,7 @@ const CURL_FORMADD_DISABLED = 7
 const CURL_FORMADD_LAST = 8
 # end
 @ctypedef CURLFORMcode Int32
-@ctypedef curl_formget_callback Ptr{:Void}
+@ctypedef curl_formget_callback Ptr{Void}
 # enum CURLINFO
 const CURLINFO_NONE = 0
 const CURLINFO_EFFECTIVE_URL = 1048577
@@ -583,8 +587,8 @@ const CURL_LOCK_ACCESS_SINGLE = 2
 const CURL_LOCK_ACCESS_LAST = 3
 # end
 @ctypedef curl_lock_access Int32
-@ctypedef curl_lock_function Ptr{:Void}
-@ctypedef curl_unlock_function Ptr{:Void}
+@ctypedef curl_lock_function Ptr{Void}
+@ctypedef curl_unlock_function Ptr{Void}
 @ctypedef CURLSH None
 # enum CURLSHcode
 const CURLSHE_OK = 0
@@ -627,14 +631,16 @@ const CURLM_BAD_SOCKET = 5
 const CURLM_UNKNOWN_OPTION = 6
 const CURLM_LAST = 7
 # end
+@ctypedef CURLMcode Int32
 # enum CURLMSG
 const CURLMSG_NONE = 0
 const CURLMSG_DONE = 1
 const CURLMSG_LAST = 2
 # end
+@ctypedef CURLMSG Int32
 @ctypedef CURLMsg Void
-@ctypedef curl_socket_callback Ptr{:Void}
-@ctypedef curl_multi_timer_callback Ptr{:Void}
+@ctypedef curl_socket_callback Ptr{Void}
+@ctypedef curl_multi_timer_callback Ptr{Void}
 # enum CURLMoption
 const CURLMOPT_SOCKETFUNCTION = 20001
 const CURLMOPT_SOCKETDATA = 10002
@@ -644,3 +650,4 @@ const CURLMOPT_TIMERDATA = 10005
 const CURLMOPT_MAXCONNECTS = 6
 const CURLMOPT_LASTENTRY = 7
 # end
+@ctypedef CURLMoption Int32
