@@ -89,3 +89,24 @@ close(f)
 close(fe)
 
 
+# Generate the File extension to MIME type mapping.
+f = open("mime_ext.jl", "w+")
+write(f, "module mime_ext\n\nexport MimeExt\n\nMimeExt = {\n")
+
+mimes = split(open(readall, "/etc/mime.types"), "\n")
+for e in mimes
+  m = match(r"^\s*#", e)
+  if (m == nothing)
+    tokens = split(e)
+    if (length(tokens) > 1)
+        for i = 2:length(tokens)
+            write (f, "  \"$(tokens[i])\" => \"$(tokens[1])\",\n")
+        end
+    end
+  end
+end
+
+write(f, "  \"\" => \"\"\n}\n\nend\n")
+close(f)
+
+

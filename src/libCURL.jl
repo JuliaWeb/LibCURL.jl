@@ -13,6 +13,10 @@ include("lC_curl_h.jl")
 @c CURLcode curl_easy_setopt (Ptr{CURL}, CURLoption,Ptr{Void}...) libcurl
 @c CURLcode curl_easy_setopt (Ptr{CURL}, CURLoption,Ptr{Uint8}...) libcurl
 
+@c CURLcode curl_multi_setopt (Ptr{CURL}, CURLoption, Int...) libcurl
+@c CURLcode curl_multi_setopt (Ptr{CURL}, CURLoption,Ptr{Void}...) libcurl
+@c CURLcode curl_multi_setopt (Ptr{CURL}, CURLoption,Ptr{Uint8}...) libcurl
+
 @c CURLcode curl_easy_getinfo (Ptr{CURL}, CURLoption,Ptr{Int}...) libcurl
 @c CURLcode curl_easy_getinfo (Ptr{CURL}, CURLoption,Ptr{Float64}...) libcurl
 @c CURLcode curl_easy_getinfo (Ptr{CURL}, CURLoption,Ptr{Uint8}...) libcurl
