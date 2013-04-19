@@ -18,15 +18,61 @@ lC_defines_h.jl and lC_exports_j.jl will also be generated from clang.jl once cl
 
 libCURL.jl mostly includes the generated files and also defines a few variadic functions (clang.jl does not yet support varargs)
 
-httpc.jl is a http client and currently only has support for the GET verb. More will be added. It uses the multi interface in a polling fashion.
-
 libCURL.jl should be used for low level 1:1 mapping of the libCURL API in Julia.
+
+httpc.jl is the http client API wrapping libCURL for common use cases
+
+mime_ext.jl is generated from /etc/mime.types and maps common file extensions to their MIME types
+
+
+USAGE
+=====
+
+The exported APIs from module httpc are :
+
+```
+ get(url::String; timeout::Float64, cb::Function)
+
+ post (url::String, data::String; content_type::String, timeout::Float64, cb::Function)
+
+ put (url::String, data::String; content_type::String, timeout::Float64, cb::Function)
+
+ post_file (url::String, filename::String; content_type::String, timeout::Float64, cb::Function)
+ 
+ put_file (url::String, filename::String; content_type::String, timeout::Float64, cb::Function)
+ 
+ head(url::String; timeout::Float64, cb::Function)
+ 
+ delete(url::String, timeout::Float64, cb::Function)
+ 
+ trace(url::String, timeout::Float64, cb::Function)
+ 
+ options(url::String, timeout::Float64, cb::Function)
+```
+
+- Each of the functions takes in an optional callback. The signature of the callback should be
+  ```customize_cb(curl)``` where ```curl``` is the libCURL handle. The callback can further customize
+  the request by using libCURL easy* APIs directly
+
+- Each method returns a Response object of the type:
+```
+    type Response
+        body
+        headers
+        http_code
+        total_time
+
+        Response() = new("", Dict{ASCIIString, ASCIIString}(), 0, 0.0)
+    end
+```
+
+- ```content_type```, ```timeout``` and ```cb``` are all optional parameters. Default value for the timeout is 30.0 seconds
+
 
 
 TODO
 ====
-- Add more verbs
-- Use curl_multi_socket_action() instead of curl_multi_perform
+- Change the sleep in a loop to using fdwatcher when support for fdwatcher becomes available in mainline
 
 
 
