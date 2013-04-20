@@ -4,15 +4,15 @@ using libCURL
 using mime_ext
 
 export init, cleanup, get, put, put_file, post, post_file, trace, delete, head, options
-export Response, ContentType
+export Response, ContentType, QueryStrDict
 
 import Base.convert
 
 typealias Callback Union(Function,Bool)
 typealias ContentType Union(String,Bool)
+typealias QueryDict Union(Dict,Bool)
 
 default_timeout = 30.0
-
 
 ##############################
 # Struct definitions
@@ -40,6 +40,7 @@ end
 
 type ConnContext
     curl::Ptr{CURL}
+    url::String
     slist::Ptr{Void}
     rd::ReadData
     resp::Response
@@ -47,7 +48,7 @@ type ConnContext
     cb::Callback
     content_type::ContentType
     
-    ConnContext() = new(0, 0, ReadData(), Response(), default_timeout, false, false)
+    ConnContext() = new(0, "", 0, ReadData(), Response(), default_timeout, false, false)
 end
 
 immutable CURLMsg2
@@ -139,7 +140,7 @@ function get_ct_from_ext(filename)
 end
 
 
-function setup_easy_handle(url, timeout::Float64, cb::Callback, content_type::ContentType)
+function setup_easy_handle(url, querydict::QueryDict, timeout::Float64, cb::Callback, content_type::ContentType)
     ctxt = ConnContext()
     ctxt.timeout = timeout
     ctxt.cb = cb
@@ -154,6 +155,35 @@ function setup_easy_handle(url, timeout::Float64, cb::Callback, content_type::Co
 
     @ce_curl curl_easy_setopt CURLOPT_MAXREDIRS 5
 
+    if isa(querydict, Dict)
+        qp = mapreduce(
+                i -> begin
+                        k,v = i;
+                        sk = string(k)
+                        sv = string(v)
+                        
+                        ek = curl_easy_escape( curl, sk, length(sk))
+                        ev = curl_easy_escape( curl, sv, length(sv))
+
+                        ep = bytestring(ek) * "=" * bytestring(ev)
+
+                        curl_free(ek)
+                        curl_free(ev)
+                        
+                        ep
+                    end,
+                    
+                (ep1,ep2) -> ep1 * "&&" * ep2,
+                
+                collect(querydict)
+            )
+
+        url = url * "?" * qp
+    end
+
+
+    ctxt.url = url
+    
     @ce_curl curl_easy_setopt CURLOPT_URL url
     @ce_curl curl_easy_setopt CURLOPT_WRITEFUNCTION c_write_cb
 
@@ -231,10 +261,10 @@ cleanup() = curl_global_cleanup()
 # GET
 ##############################
 
-function get(url::String; timeout=default_timeout, cb=false)
+function get(url::String; querydict=false, timeout=default_timeout, cb=false)
     ctxt = false
     try
-        ctxt = setup_easy_handle(url, timeout, cb, false)
+        ctxt = setup_easy_handle(url, querydict, timeout, cb, false)
         
         @ce_curl curl_easy_setopt CURLOPT_HTTPGET 1
         
@@ -249,24 +279,24 @@ end
 # POST & PUT
 ##############################
 
-post (url::String, data::String; content_type=false, timeout=default_timeout, cb=false) = put_post(url, :post, data, content_type, timeout, cb)
-put (url::String, data::String; content_type=false, timeout=default_timeout, cb=false) = put_post(url, :put, data, content_type, timeout, cb)
+post (url::String, data::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post(url, querydict, :post, data, content_type, timeout, cb)
+put (url::String, data::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post(url, querydict, :put, data, content_type, timeout, cb)
 
-function put_post(url::String, putorpost::Symbol, data::String, content_type=false, timeout=default_timeout, cb=false)
+function put_post(url::String, querydict::QueryDict, putorpost::Symbol, data::String, content_type=false, timeout=default_timeout, cb=false)
     rd::ReadData = ReadData()
     rd.typ = :buffer
     rd.str = data
     rd.offset = 0
     rd.sz = length(data)
 
-    _put_post(url, putorpost, content_type, timeout, cb, rd)
+    _put_post(url, querydict, putorpost, content_type, timeout, cb, rd)
 end
 
 
-post_file (url::String, filename::String; content_type=false, timeout=default_timeout, cb=false) = put_post_file(url, :post, filename, content_type, timeout, cb)
-put_file (url::String, filename::String; content_type=false, timeout=default_timeout, cb=false) = put_post_file(url, :put, filename, content_type, timeout, cb)
+post_file (url::String, filename::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post_file(url, querydict, :post, filename, content_type, timeout, cb)
+put_file (url::String, filename::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post_file(url, querydict, :put, filename, content_type, timeout, cb)
 
-function put_post_file(url::String, putorpost::Symbol, filename::String, content_type=false, timeout=default_timeout, cb=false)
+function put_post_file(url::String, querydict::QueryDict, putorpost::Symbol, filename::String, content_type=false, timeout=default_timeout, cb=false)
     rd::ReadData = ReadData()
     rd.typ = :io
     rd.offset = 0
@@ -275,7 +305,7 @@ function put_post_file(url::String, putorpost::Symbol, filename::String, content
 
     try
         if (content_type == false) content_type = get_ct_from_ext(filename) end
-        return _put_post(url, putorpost, content_type, timeout, cb, rd)
+        return _put_post(url, querydict, putorpost, content_type, timeout, cb, rd)
     finally
         close(rd.fd)
     end
@@ -283,10 +313,10 @@ end
 
 
 
-function _put_post(url::String, putorpost::Symbol, content_type::ContentType, timeout::Float64, cb::Callback, rd::ReadData)
+function _put_post(url::String, querydict::QueryDict, putorpost::Symbol, content_type::ContentType, timeout::Float64, cb::Callback, rd::ReadData)
     ctxt = false
     try
-        ctxt = setup_easy_handle(url, timeout, cb, content_type)
+        ctxt = setup_easy_handle(url, querydict, timeout, cb, content_type)
         ctxt.rd = rd
 
         if (putorpost == :post)
@@ -323,10 +353,10 @@ end
 # HEAD, DELETE and TRACE
 ##############################
 
-function head(url::String; timeout=default_timeout, cb=false)
+function head(url::String; querydict=false, timeout=default_timeout, cb=false)
     ctxt = false
     try
-        ctxt = setup_easy_handle(url, timeout, cb, false)
+        ctxt = setup_easy_handle(url, querydict, timeout, cb, false)
 
         @ce_curl curl_easy_setopt CURLOPT_NOBODY 1
 
@@ -336,14 +366,14 @@ function head(url::String; timeout=default_timeout, cb=false)
     end
 end
 
-delete(url::String, timeout=default_timeout, cb=false) = custom(url, "DELETE", timeout, cb)
-trace(url::String, timeout=default_timeout, cb=false) = custom(url, "TRACE", timeout, cb)
-options(url::String, timeout=default_timeout, cb=false) = custom(url, "OPTIONS", timeout, cb)
+delete(url::String; querydict=false, timeout=default_timeout, cb=false) = custom(url, querydict, "DELETE", timeout, cb)
+trace(url::String; querydict=false, timeout=default_timeout, cb=false) = custom(url, querydict, "TRACE", timeout, cb)
+options(url::String; querydict=false, timeout=default_timeout, cb=false) = custom(url, querydict, "OPTIONS", timeout, cb)
 
-function custom(url::String, verb::String, timeout::Float64, cb::Callback)
+function custom(url::String, querydict::QueryDict, verb::String, timeout::Float64, cb::Callback)
     ctxt = false
     try
-        ctxt = setup_easy_handle(url, timeout, cb, false)
+        ctxt = setup_easy_handle(url, querydict, timeout, cb, false)
 
         @ce_curl curl_easy_setopt CURLOPT_CUSTOMREQUEST verb
 
@@ -375,7 +405,7 @@ function exec_as_multi(ctxt)
         cmc = curl_multi_perform(curlm, n_active);
         while (n_active[1] > 0) && ((till - now) > 0)
             sleep(0.025)   # 25 milliseconds
-#            println("@sleep")
+#            println("@sleep for url: " * ctxt.url)
             
             cmc = curl_multi_perform(curlm, n_active);    
             if(cmc != CURLM_OK) error ("curl_multi_perform() failed: " * curl_multi_strerror(cmc)) end

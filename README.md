@@ -31,43 +31,53 @@ USAGE
 The exported APIs from module httpc are :
 
 ```
- get(url::String; timeout::Float64, cb::Function)
+ get(url::String; querydict::Dict, timeout::Float64, cb::Function)
 
- post (url::String, data::String; content_type::String, timeout::Float64, cb::Function)
+ post (url::String, data::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
 
- put (url::String, data::String; content_type::String, timeout::Float64, cb::Function)
+ put (url::String, data::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
 
- post_file (url::String, filename::String; content_type::String, timeout::Float64, cb::Function)
+ post_file (url::String, filename::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
  
- put_file (url::String, filename::String; content_type::String, timeout::Float64, cb::Function)
+ put_file (url::String, filename::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
  
- head(url::String; timeout::Float64, cb::Function)
+ head(url::String; querydict::Dict, timeout::Float64, cb::Function)
  
- delete(url::String, timeout::Float64, cb::Function)
+ delete(url::String; querydict::Dict, timeout::Float64, cb::Function)
  
- trace(url::String, timeout::Float64, cb::Function)
+ trace(url::String; querydict::Dict, timeout::Float64, cb::Function)
  
- options(url::String, timeout::Float64, cb::Function)
+ options(url::String; querydict::Dict, timeout::Float64, cb::Function)
 ```
-
-- Each of the functions takes in an optional callback. The signature of the callback should be
-  ```customize_cb(curl)``` where ```curl``` is the libCURL handle. The callback can further customize
-  the request by using libCURL easy* APIs directly
 
 - Each method returns a Response object of the type:
 ```
     type Response
-        body
-        headers
-        http_code
-        total_time
-
-        Response() = new("", Dict{ASCIIString, ASCIIString}(), 0, 0.0)
+        body::String
+        headers::Dict{ASCIIString, ASCIIString}
+        http_code::Int
+        total_time::Float64
     end
 ```
 
-- ```content_type```, ```timeout``` and ```cb``` are all optional parameters. Default value for the timeout is 30.0 seconds
+- ```querydict```, ```content_type```, ```timeout``` and ```cb``` are all optional parameters.
 
+- The user can pass in a complete url in the ```url``` parameter or can pass in the query parameters
+  in the ```querydict```.
+
+  In the former case, the passed url is executed as is.
+
+  In the latter case the complete URL if formed by concatenating the ```url``` field, a "?" and
+  the escaped (key,value) pairs. 
+
+- In all file upload cases, an attempt is made to set the ```content_type``` type automatically as
+  derived from the file extension
+  
+- Default value for the timeout is 30.0 seconds
+
+- Each of the functions takes in an optional callback. The signature of the callback should be
+  ```customize_cb(curl)``` where ```curl``` is the libCURL handle. The callback can further customize
+  the request by using libCURL easy* APIs directly
 
 
 TODO
