@@ -4,7 +4,8 @@ using libCURL
 using libCURL.Mime_ext
 
 export init, cleanup, get, put, put_file, post, post_file, trace, delete, head, options
-export get_async
+export get_async, post_async, put_async, post_file_async, put_file_async, head_async, delete_async, trace_async, options_async
+
 
 export Response, ContentType, QueryStrDict
 

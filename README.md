@@ -50,8 +50,11 @@ The exported APIs from module HTTPC are :
  options(url::String; querydict::Dict, timeout::Float64, cb::Function)
 ```
 
-- The "futures" versions of the above APIs are ```get_async, post_async, put_async, post_file_async,
-put_file_async, head_async, delete_async, trace_async and options_async```.
+- The "futures" versions of the above APIs are:
+```
+    get_async, post_async, put_async, post_file_async,
+    put_file_async, head_async, delete_async, trace_async and options_async
+```
 
 - They are called with the same arguments as the sync versions. All return a RemoteRef which yields the Response object upon response completion.
 
