@@ -1,4 +1,4 @@
-module mime_ext
+module Mime_ext
 
 export MimeExt
 

@@ -1,9 +1,11 @@
-module httpc
+module HTTPC
 
 using libCURL
-using mime_ext
+using libCURL.Mime_ext
 
 export init, cleanup, get, put, put_file, post, post_file, trace, delete, head, options
+export get_async
+
 export Response, ContentType, QueryStrDict
 
 import Base.convert
@@ -134,7 +136,7 @@ end
 function get_ct_from_ext(filename)
     fparts = split(basename(filename), ".")
     if (length(fparts) > 1)
-        if has(MimeExt, fparts[end]) return MimeExt[fparts[end]] end
+        if haskey(MimeExt, fparts[end]) return MimeExt[fparts[end]] end
     end
     return false
 end
@@ -261,7 +263,10 @@ cleanup() = curl_global_cleanup()
 # GET
 ##############################
 
-function get(url::String; querydict=false, timeout=default_timeout, cb=false)
+get(url::String; querydict=false, timeout=default_timeout, cb=false) = get_i(url, querydict, timeout, cb)
+get_async(url::String; querydict=false, timeout=default_timeout, cb=false) = remotecall(myid(), get_i, url, querydict, timeout, cb)
+
+function get_i(url::String, querydict::QueryDict, timeout::Float64, cb=Callback)
     ctxt = false
     try
         ctxt = setup_easy_handle(url, querydict, timeout, cb, false)
@@ -280,9 +285,13 @@ end
 ##############################
 
 post (url::String, data::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post(url, querydict, :post, data, content_type, timeout, cb)
-put (url::String, data::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post(url, querydict, :put, data, content_type, timeout, cb)
+post_async (url::String, data::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) =
+    remotecall(myid(), put_post, url, querydict, :post, data, content_type, timeout, cb)
 
-function put_post(url::String, querydict::QueryDict, putorpost::Symbol, data::String, content_type=false, timeout=default_timeout, cb=false)
+put (url::String, data::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post(url, querydict, :put, data, content_type, timeout, cb)
+put_async (url::String, data::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = remotecall(myid(), put_post, url, querydict, :put, data, content_type, timeout, cb)
+
+function put_post(url::String, querydict::QueryDict, putorpost::Symbol, data::String, content_type::ContentType, timeout::Float64, cb::Callback)
     rd::ReadData = ReadData()
     rd.typ = :buffer
     rd.str = data
@@ -294,9 +303,12 @@ end
 
 
 post_file (url::String, filename::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post_file(url, querydict, :post, filename, content_type, timeout, cb)
-put_file (url::String, filename::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post_file(url, querydict, :put, filename, content_type, timeout, cb)
+post_file_async (url::String, filename::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = remotecall(myid(), put_post_file, url, querydict, :post, filename, content_type, timeout, cb)
 
-function put_post_file(url::String, querydict::QueryDict, putorpost::Symbol, filename::String, content_type=false, timeout=default_timeout, cb=false)
+put_file (url::String, filename::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = put_post_file(url, querydict, :put, filename, content_type, timeout, cb)
+put_file_async (url::String, filename::String; querydict=false, content_type=false, timeout=default_timeout, cb=false) = remotecall(myid(), put_post_file, url, querydict, :put, filename, content_type, timeout, cb)
+
+function put_post_file(url::String, querydict::QueryDict, putorpost::Symbol, filename::String, content_type::ContentType, timeout::Float64, cb::Callback)
     rd::ReadData = ReadData()
     rd.typ = :io
     rd.offset = 0
@@ -352,8 +364,10 @@ end
 ##############################
 # HEAD, DELETE and TRACE
 ##############################
+head(url::String; querydict=false, timeout=default_timeout, cb=false) = head_i(url, querydict, timeout, cb)
+head_async(url::String; querydict=false, timeout=default_timeout, cb=false) = remotecall(myid(), head_i, url, querydict, timeout, cb)
 
-function head(url::String; querydict=false, timeout=default_timeout, cb=false)
+function head_i(url::String, querydict::QueryDict, timeout::Float64, cb::Callback)
     ctxt = false
     try
         ctxt = setup_easy_handle(url, querydict, timeout, cb, false)
@@ -367,8 +381,13 @@ function head(url::String; querydict=false, timeout=default_timeout, cb=false)
 end
 
 delete(url::String; querydict=false, timeout=default_timeout, cb=false) = custom(url, querydict, "DELETE", timeout, cb)
+delete_async(url::String; querydict=false, timeout=default_timeout, cb=false) = remotecall(myid(), custom, url, querydict, "DELETE", timeout, cb)
+
 trace(url::String; querydict=false, timeout=default_timeout, cb=false) = custom(url, querydict, "TRACE", timeout, cb)
+trace_async(url::String; querydict=false, timeout=default_timeout, cb=false) = remotecall(myid(), custom, url, querydict, "TRACE", timeout, cb)
+
 options(url::String; querydict=false, timeout=default_timeout, cb=false) = custom(url, querydict, "OPTIONS", timeout, cb)
+options_async(url::String; querydict=false, timeout=default_timeout, cb=false) = remotecall(myid(), custom, url, querydict, "OPTIONS", timeout, cb)
 
 function custom(url::String, querydict::QueryDict, verb::String, timeout::Float64, cb::Callback)
     ctxt = false
@@ -395,7 +414,7 @@ function exec_as_multi(ctxt)
         if isa(ctxt.cb, Function) ctxt.cb(curl) end
     
         cmc = curl_multi_add_handle(curlm, curl)
-        if(cmc != CURLM_OK) error ("curl_multi_add_handle() failed: " * curl_multi_strerror(cmc)) end
+        if(cmc != CURLM_OK) error ("curl_multi_add_handle() failed: " * bytestring(curl_multi_strerror(cmc))) end
 
         n_active = Array(Int,1)
         n_active[1] = 1
@@ -408,7 +427,7 @@ function exec_as_multi(ctxt)
 #            println("@sleep for url: " * ctxt.url)
             
             cmc = curl_multi_perform(curlm, n_active);    
-            if(cmc != CURLM_OK) error ("curl_multi_perform() failed: " * curl_multi_strerror(cmc)) end
+            if(cmc != CURLM_OK) error ("curl_multi_perform() failed: " * bytestring(curl_multi_strerror(cmc))) end
 
             now  = int64(time()*1000)
         end    
@@ -419,12 +438,13 @@ function exec_as_multi(ctxt)
 
             while (p_msg != C_NULL)
 #                println("Messages left in Q : " * string(msgs_in_queue[1]))
-                msg = unsafe_ref(p_msg)
+                msg = unsafe_load(p_msg)
 
                 if (msg.msg == CURLMSG_DONE)
-                    if (convert(Int, msg.data) != CURLE_OK)
+                    ec = convert(Int, msg.data) 
+                    if (ec != CURLE_OK)
 #                        println("Result of transfer: " * string(msg.data))
-                        throw("Error executing request")
+                        throw("Error executing request : " * bytestring(curl_easy_strerror(ec)))
                     else
                         process_response(ctxt)
                     end
@@ -443,9 +463,6 @@ function exec_as_multi(ctxt)
     
     ctxt.resp    
 end
-
-
-
 
 
 end

@@ -576,7 +576,6 @@ export CURLVERSION_THIRD
 export CURLVERSION_FOURTH
 export CURLVERSION_LAST
 export CURLversion
-export curl_version_info_data
 export CURLM
 export CURLM_CALL_MULTI_PERFORM
 export CURLM_OK
@@ -592,7 +591,6 @@ export CURLMSG_NONE
 export CURLMSG_DONE
 export CURLMSG_LAST
 export CURLMSG
-export CURLMsg
 export curl_socket_callback
 export curl_multi_timer_callback
 export CURLMOPT_SOCKETFUNCTION

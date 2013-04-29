@@ -14,14 +14,16 @@ clang_extraargs = ["-D", "__STDC_LIMIT_MACROS", "-D", "__STDC_CONSTANT_MACROS"]
 
 wrap_hdrs = map( x-> joinpath("/usr/include/curl", x), [ "curl.h", "easy.h", "multi.h" ])
 
-wc = wrap_c.init(".", "lC_common_h.jl", clang_includes, clang_extraargs, (th, h) -> contains(wrap_hdrs, h) , h -> "libcurl", h -> "./lC_" * replace(last(split(h, "/")), ".", "_")  * ".jl" )
+wc = wrap_c.init(".", "../src/lC_common_h.jl", clang_includes, clang_extraargs, (th, h) -> contains(wrap_hdrs, h) , h -> "libcurl", h -> "../src/lC_" * replace(last(split(h, "/")), ".", "_")  * ".jl" )
+wc.options.wrap_structs = true
+
 wrap_c.wrap_c_headers(wc, ["/usr/include/curl/curl.h"])
 
 # generate export statements.....
-fe = open("lC_exports_h.jl", "w+")
+fe = open("../src/lC_exports_h.jl", "w+")
 println(fe, "#   Generating exports")
 
-fc = open("lC_curl_h.jl", "r")
+fc = open("../src/lC_curl_h.jl", "r")
 curljl = split(readall(fc), "\n")
 close(fc)
 
@@ -33,7 +35,7 @@ for e in curljl
   end
 end
 
-fc = open("lC_common_h.jl", "r")
+fc = open("../src/lC_common_h.jl", "r")
 curljl = split(readall(fc), "\n")
 close(fc)
 
@@ -72,7 +74,7 @@ const ign_defs = [
 ]
 
 
-f = open("lC_defines_h.jl", "w+")
+f = open("../src/lC_defines_h.jl", "w+")
 println(f, "#   Generating #define constants")
 
 hashdefs = split(readall(`gcc -E -dD -P /usr/include/curl/curl.h`), "\n")
@@ -90,8 +92,8 @@ close(fe)
 
 
 # Generate the File extension to MIME type mapping.
-f = open("mime_ext.jl", "w+")
-write(f, "module mime_ext\n\nexport MimeExt\n\nMimeExt = {\n")
+f = open("../src/Mime_ext.jl", "w+")
+write(f, "module Mime_ext\n\nexport MimeExt\n\nMimeExt = {\n")
 
 mimes = split(open(readall, "/etc/mime.types"), "\n")
 for e in mimes
