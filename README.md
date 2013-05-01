@@ -31,33 +31,28 @@ USAGE
 The exported APIs from module HTTPC are :
 
 ```
- get(url::String; querydict::Dict, timeout::Float64, cb::Function)
+ get(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
 
- post (url::String, data::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
+ post (url::String, data; nb::Bool, qd::Dict, ct::String, rto::Float64, cb::Function)
 
- put (url::String, data::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
+ put (url::String, data; nb::Bool, qd::Dict, ct::String, rto::Float64, cb::Function)
+``` 
 
- post_file (url::String, filename::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
- 
- put_file (url::String, filename::String; querydict::Dict, content_type::String, timeout::Float64, cb::Function)
- 
- head(url::String; querydict::Dict, timeout::Float64, cb::Function)
- 
- delete(url::String; querydict::Dict, timeout::Float64, cb::Function)
- 
- trace(url::String; querydict::Dict, timeout::Float64, cb::Function)
- 
- options(url::String; querydict::Dict, timeout::Float64, cb::Function)
+- For both ```post``` and ```put``` above, the data can be either a
+  - String - sent as is.
+  - IOStream - Content type is set to "application/octet-stream" unless specified otherwise
+  - Dict - Content type is set to "application/x-www-form-urlencoded" unless specified otherwise
+  - (:file, filename::Filename) - The file is read, and the content-type is set automatically unless specified otherwise.
+
 ```
-
-- The "futures" versions of the above APIs are:
+ head(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
+ 
+ delete(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
+ 
+ trace(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
+ 
+ options(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
 ```
-    get_async, post_async, put_async, post_file_async,
-    put_file_async, head_async, delete_async, trace_async and options_async
-```
-
-- They are called with the same arguments as the sync versions. All return a RemoteRef which yields the Response object upon response completion.
-
 
 - Each method returns a Response object of the type:
 ```
@@ -69,25 +64,43 @@ The exported APIs from module HTTPC are :
     end
 ```
 
-- ```querydict```, ```content_type```, ```timeout``` and ```cb``` are all optional parameters.
+- ```nb```(Non-Blocking), ```qd```(Query String Dictionary), ```ct``` (ContentType), 
+  ```rto```(Request TimeOut) and ```cb```(Callback Function) are all optional parameters.
+
+
+- By default all APIs block till request completion and return Response objects. 
+
+- If ```nb``` is set to ```true```, then the API returns immediately with a RemoteRef.
 
 - The user can pass in a complete url in the ```url``` parameter or can pass in the query parameters
-  in the ```querydict```.
+  in the ```qd```. 
 
   In the former case, the passed url is executed as is.
 
   In the latter case the complete URL if formed by concatenating the ```url``` field, a "?" and
-  the escaped (key,value) pairs. 
+  the escaped (key,value) pairs. Both the keys and values in the dictionary must be convertible to appropriate ASCIIStrings.
+  Nested dictionaries and arrays are not supported.
 
-- In all file upload cases, an attempt is made to set the ```content_type``` type automatically as
+- In all file upload cases, an attempt is made to set the ```ct``` type automatically as
   derived from the file extension
   
-- Default value for the timeout is 30.0 seconds
+- Default value for the rto is 30.0 seconds
 
 - Each of the functions takes in an optional callback. The signature of the callback should be
   ```customize_cb(curl)``` where ```curl``` is the libCURL handle. The callback can further customize
   the request by using libCURL easy* APIs directly
 
+
+  
+- The "_nb" versions of the above APIs are equivalent to calling each API with ```nb=true```
+```
+    get_nb, post_nb, put_nb, post_file_nb,
+    put_file_nb, head_nb, delete_nb, trace_nb and options_nb
+```
+
+
+  
+  
 SAMPLES
 =======
 - See test/tests.jl for sample code
