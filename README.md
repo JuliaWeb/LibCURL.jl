@@ -28,33 +28,52 @@ Mime_ext.jl is generated from /etc/mime.types and maps common file extensions to
 USAGE
 =====
 
-The exported APIs from module HTTPC are :
+### Types
+
+All HTTP request APIs take in a object of type ```RequestOptions```
 
 ```
- get(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
-
- post (url::String, data; nb::Bool, qd::Dict, ct::String, rto::Float64, cb::Function)
-
- put (url::String, data; nb::Bool, qd::Dict, ct::String, rto::Float64, cb::Function)
-``` 
-
-- For both ```post``` and ```put``` above, the data can be either a
-  - String - sent as is.
-  - IOStream - Content type is set to "application/octet-stream" unless specified otherwise
-  - Dict - Content type is set to "application/x-www-form-urlencoded" unless specified otherwise
-  - (:file, filename::Filename) - The file is read, and the content-type is set automatically unless specified otherwise.
-
-```
- head(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
- 
- delete(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
- 
- trace(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
- 
- options(url::String; nb::Bool, qd::Dict, rto::Float64, cb::Function)
+type RequestOptions
+    blocking::Bool 
+    query_params::Vector{Tuple} 
+    request_timeout::Float64
+    callback::Union(Function,Bool)
+    content_type::String
+    headers::Vector{Tuple}
+    ostream::Union{IO, Nothing}
+    
+    RequestOptions(; blocking=true, query_params=Array(Tuple,0), request_timeout=def_rto, callback=null_cb, content_type="", headers=Array(Tuple,0)) = 
+    new(blocking, query_params, request_timeout, callback, content_type, headers)
+end
 ```
 
-- Each method returns a Response object of the type:
+- By default all APIs block till request completion and return Response objects. 
+
+- If ```blocking``` is set to ```false```, then the API returns immediately with a RemoteRef.
+
+- The user can pass in a complete url in the ```url``` parameter of the API, or can set query_params as a ```Vector``` of ```(Name, Value)``` tuples
+
+  In the former case, the passed url is executed as is.
+
+  In the latter case the complete URL if formed by concatenating the ```url``` field, a "?" and
+  the escaped (name,value) pairs. Both the name and values must be convertible to appropriate ASCIIStrings.
+
+- In all file upload cases, an attempt is made to set the ```content_type``` type automatically as
+  derived from the file extension
+  
+- Default value for the request_timeout is 30.0 seconds
+
+- If a callback is specified, its signature should be  ```customize_cb(curl)``` where ```curl``` is the libCURL handle. 
+  The callback can further customize the request by using libCURL easy* APIs directly
+
+- headers - additional headers to be set. Vector of {Name, Value} Tuples
+
+- ostream - if set, any returned data to written to ostream (and not returned as part of the Response object
+  
+  
+
+Each API returns an object of type 
+
 ```
     type Response
         body::String
@@ -64,39 +83,32 @@ The exported APIs from module HTTPC are :
     end
 ```
 
-- ```nb```(Non-Blocking), ```qd```(Query String Dictionary), ```ct``` (ContentType), 
-  ```rto```(Request TimeOut) and ```cb```(Callback Function) are all optional parameters.
+The exported APIs from module HTTPC are :
 
-
-- By default all APIs block till request completion and return Response objects. 
-
-- If ```nb``` is set to ```true```, then the API returns immediately with a RemoteRef.
-
-- The user can pass in a complete url in the ```url``` parameter or can pass in the query parameters
-  in the ```qd```. 
-
-  In the former case, the passed url is executed as is.
-
-  In the latter case the complete URL if formed by concatenating the ```url``` field, a "?" and
-  the escaped (key,value) pairs. Both the keys and values in the dictionary must be convertible to appropriate ASCIIStrings.
-  Nested dictionaries and arrays are not supported.
-
-- In all file upload cases, an attempt is made to set the ```ct``` type automatically as
-  derived from the file extension
-  
-- Default value for the rto is 30.0 seconds
-
-- Each of the functions takes in an optional callback. The signature of the callback should be
-  ```customize_cb(curl)``` where ```curl``` is the libCURL handle. The callback can further customize
-  the request by using libCURL easy* APIs directly
-
-
-  
-- The "_nb" versions of the above APIs are equivalent to calling each API with ```nb=true```
 ```
-    get_nb, post_nb, put_nb, post_file_nb,
-    put_file_nb, head_nb, delete_nb, trace_nb and options_nb
+ get(url::String, options::RequestOptions)
+
+ post (url::String, data, options::RequestOptions)
+
+ put (url::String, data, options::RequestOptions)
+``` 
+
+- For both ```post``` and ```put``` above, the data can be either a
+  - String - sent as is.
+  - IOStream - Content type is set to "application/octet-stream" unless specified otherwise
+  - Dict{Name, Value} or Vector{Tuple{Name, Value}} - Content type is set to "application/x-www-form-urlencoded" unless specified otherwise
+  - (:file, filename::Filename) - The file is read, and the content-type is set automatically unless specified otherwise.
+
 ```
+ head(url::String, options::RequestOptions)
+ 
+ delete(url::String, options::RequestOptions)
+ 
+ trace(url::String, options::RequestOptions)
+ 
+ options(url::String, options::RequestOptions)
+```
+
 
 
   
