@@ -68,7 +68,10 @@ end
 
 - headers - additional headers to be set. Vector of {Name, Value} Tuples
 
-- ostream - if set, any returned data to written to ostream (and not returned as part of the Response object
+- ostream - if set as an IO, any returned data to written to ostream. 
+  If it is a String, it is treated as a filename and written to the file. 
+  In both these cases the data is not returned as part of the Response object
+
   
   
 

@@ -23,9 +23,12 @@ println("Test 1.hdrs passed, http_code : " * string(r.http_code))
 ostream=open("/tmp/google.txt", "w+")
 r=HTTPC.get("http://www.google.com/", RequestOptions(ostream=ostream))
 @test r.http_code == 200
-println("Test 1.hdrs passed, http_code : " * string(r.http_code))
+println("Test 1.ostream passed, http_code : " * string(r.http_code))
 close(ostream)
 
+r=HTTPC.get("http://www.google.com/", RequestOptions(ostream="/tmp/google2.txt"))
+@test r.http_code == 200
+println("Test 1.ostream_file passed, http_code : " * string(r.http_code))
 
 rr=HTTPC.get(RB * "?test=1nb", RequestOptions(blocking=false))
 r = fetch(rr)

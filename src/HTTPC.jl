@@ -25,7 +25,7 @@ type RequestOptions
     callback::Union(Function,Bool)
     content_type::String
     headers::Vector{Tuple}
-    ostream::Union(IO, Nothing)
+    ostream::Union(IO, String, Nothing)
     
     RequestOptions(; blocking=true, query_params=Array(Tuple,0), request_timeout=def_rto, callback=null_cb, content_type="", headers=Array(Tuple,0), ostream=nothing) = 
     new(blocking, query_params, request_timeout, callback, content_type, headers, ostream)
@@ -59,8 +59,10 @@ type ConnContext
     rd::ReadData
     resp::Response
     options::RequestOptions
+    ostream::Union(IO, Nothing)
+    close_ostream::Bool
     
-    ConnContext(options::RequestOptions) = new(C_NULL, "", C_NULL, ReadData(), Response(), options)
+    ConnContext(options::RequestOptions) = new(C_NULL, "", C_NULL, ReadData(), Response(), options, nothing, false)
 end
 
 immutable CURLMsg2
@@ -74,20 +76,20 @@ end
 # Callbacks
 ##############################
 
-function write_cb(buff::Ptr{Uint8}, sz::Uint32, n::Uint32, p_ctxt::Ptr{Void})
+function write_cb(buff::Ptr{Uint8}, sz::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
 #    println("@write_cb")
     ctxt = unsafe_pointer_to_objref(p_ctxt)
-    if isa(ctxt.options.ostream, IO)
-        write(ctxt.options.ostream, buff, sz * n)
+    if isa(ctxt.ostream, IO)
+        write(ctxt.ostream, buff, sz * n)
     else
         ctxt.resp.body = ctxt.resp.body * bytestring(buff, convert(Int32, sz * n))
     end
-    sz*n
+    (sz*n)::Csize_t
 end
 
-c_write_cb = cfunction(write_cb, Uint32, (Ptr{Uint8}, Uint32, Uint32, Ptr{Void}))
+c_write_cb = cfunction(write_cb, Csize_t, (Ptr{Uint8}, Csize_t, Csize_t, Ptr{Void}))
 
-function header_cb(buff::Ptr{Uint8}, sz::Uint32, n::Uint32, p_ctxt::Ptr{Void})
+function header_cb(buff::Ptr{Uint8}, sz::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
 #    println("@header_cb")
     ctxt = unsafe_pointer_to_objref(p_ctxt)
     hdrlines = split(bytestring(buff, convert(Int32, sz * n)), "\r\n")
@@ -99,10 +101,10 @@ function header_cb(buff::Ptr{Uint8}, sz::Uint32, n::Uint32, p_ctxt::Ptr{Void})
             ctxt.resp.headers[strip(m.captures[1])] = strip(m.captures[2])
         end
     end
-    sz*n
+    (sz*n)::Csize_t
 end
 
-c_header_cb = cfunction(header_cb, Uint32, (Ptr{Uint8}, Uint32, Uint32, Ptr{Void}))
+c_header_cb = cfunction(header_cb, Csize_t, (Ptr{Uint8}, Csize_t, Csize_t, Ptr{Void}))
 
 
 function curl_read_cb(out::Ptr{Void}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
@@ -205,6 +207,13 @@ function setup_easy_handle(url, options::RequestOptions)
     ctxt.slist = curl_slist_append (ctxt.slist, "Expect:")
     @ce_curl curl_easy_setopt CURLOPT_HTTPHEADER ctxt.slist
     
+    if isa(options.ostream, String)
+        ctxt.ostream = open(options.ostream, "w+")
+        ctxt.close_ostream = true
+    elseif isa(options.ostream, IO)
+        ctxt.ostream = options.ostream
+    end
+    
     ctxt
 end
 
@@ -216,6 +225,12 @@ function cleanup_easy_context(ctxt::Union(ConnContext,Bool))
 
         if (ctxt.curl != C_NULL)
             curl_easy_cleanup(ctxt.curl)
+        end
+        
+        if ctxt.close_ostream
+            close(ctxt.ostream)
+            ctxt.ostream = nothing
+            ctxt.close_ostream = false
         end
     end
 end
