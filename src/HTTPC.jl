@@ -82,7 +82,7 @@ function write_cb(buff::Ptr{Uint8}, sz::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
     if isa(ctxt.ostream, IO)
         write(ctxt.ostream, buff, sz * n)
     else
-        ctxt.resp.body = ctxt.resp.body * bytestring(buff, convert(Int32, sz * n))
+        ctxt.resp.body = ctxt.resp.body * bytestring(buff, convert(Int, sz * n))
     end
     (sz*n)::Csize_t
 end
@@ -92,7 +92,7 @@ c_write_cb = cfunction(write_cb, Csize_t, (Ptr{Uint8}, Csize_t, Csize_t, Ptr{Voi
 function header_cb(buff::Ptr{Uint8}, sz::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
 #    println("@header_cb")
     ctxt = unsafe_pointer_to_objref(p_ctxt)
-    hdrlines = split(bytestring(buff, convert(Int32, sz * n)), "\r\n")
+    hdrlines = split(bytestring(buff, convert(Int, sz * n)), "\r\n")
 
 #    println(hdrlines)
     for e in hdrlines
@@ -537,7 +537,7 @@ function exec_as_multi(ctxt)
         end    
 
         if (n_active[1] == 0)
-            msgs_in_queue = Array(Int32,1)
+            msgs_in_queue = Array(Cint,1)
             p_msg::Ptr{CURLMsg2} = curl_multi_info_read(curlm, msgs_in_queue)
 
             while (p_msg != C_NULL)
