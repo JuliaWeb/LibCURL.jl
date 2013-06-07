@@ -41,9 +41,7 @@ type RequestOptions
     content_type::String
     headers::Vector{Tuple}
     ostream::Union{IO, Nothing}
-    
-    RequestOptions(; blocking=true, query_params=Array(Tuple,0), request_timeout=def_rto, callback=null_cb, content_type="", headers=Array(Tuple,0)) = 
-    new(blocking, query_params, request_timeout, callback, content_type, headers)
+    auto_content_type::Bool
 end
 ```
 
@@ -58,10 +56,14 @@ end
   In the latter case the complete URL if formed by concatenating the ```url``` field, a "?" and
   the escaped (name,value) pairs. Both the name and values must be convertible to appropriate ASCIIStrings.
 
-- In all file upload cases, an attempt is made to set the ```content_type``` type automatically as
-  derived from the file extension
+- In file upload cases, an attempt is made to set the ```content_type``` type automatically as
+  derived from the file extension unless ```auto_content_type``` is set to false.
+
+- ```auto_content_type``` - default is true. If the content_type has not been explicitly specified, 
+  the library will try to guess the content type for a PUT/POST from the file extension. 
+  For POST it will default to "application/x-www-form-urlencoded". Set this parameter to false to override this behaviour  
   
-- Default value for the request_timeout is 30.0 seconds
+- Default value for the ```request_timeout``` is 0.0 seconds, i.e., never timeout. 
 
 - If a callback is specified, its signature should be  ```customize_cb(curl)``` where ```curl``` is the libCURL handle. 
   The callback can further customize the request by using libCURL easy* APIs directly

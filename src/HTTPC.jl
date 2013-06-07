@@ -11,7 +11,7 @@ export RequestOptions, Response
 import Base.convert
 
 
-def_rto = 30.0
+def_rto = 0.0
 
 
 ##############################
@@ -26,9 +26,10 @@ type RequestOptions
     content_type::String
     headers::Vector{Tuple}
     ostream::Union(IO, String, Nothing)
+    auto_content_type::Bool
     
-    RequestOptions(; blocking=true, query_params=Array(Tuple,0), request_timeout=def_rto, callback=null_cb, content_type="", headers=Array(Tuple,0), ostream=nothing) = 
-    new(blocking, query_params, request_timeout, callback, content_type, headers, ostream)
+    RequestOptions(; blocking=true, query_params=Array(Tuple,0), request_timeout=def_rto, callback=null_cb, content_type="", headers=Array(Tuple,0), ostream=nothing, auto_content_type=true) = 
+    new(blocking, query_params, request_timeout, callback, content_type, headers, ostream, auto_content_type)
 end
 
 type Response
@@ -196,7 +197,11 @@ function setup_easy_handle(url, options::RequestOptions)
     if options.content_type != ""
         ct = "Content-Type: " * options.content_type
         ctxt.slist = curl_slist_append (ctxt.slist, ct)
+    else
+        # Disable libCURL automatically setting the content type
+        ctxt.slist = curl_slist_append (ctxt.slist, "Content-Type:")
     end
+    
     
     for hdr in options.headers
         hdr_str = hdr[1] * ":" * hdr[2]
@@ -338,7 +343,9 @@ function put_post(url::String, data, putorpost::Symbol, options::RequestOptions)
         rd.sz = length(rd.str)
         rd.typ = :buffer
         rd.src = arr_data
-        if (options.content_type == "") options.content_type = "application/x-www-form-urlencoded" end
+        if ((options.content_type == "") && (options.auto_content_type))
+            options.content_type = "application/x-www-form-urlencoded" 
+        end
         
     elseif isa(data, IOStream)
         rd.typ = :io
@@ -346,7 +353,9 @@ function put_post(url::String, data, putorpost::Symbol, options::RequestOptions)
         seekend(data)    
         rd.sz = position(data)
         seekstart(data)
-        if (options.content_type == "") options.content_type = "application/octet-stream" end
+        if ((options.content_type == "") && (options.auto_content_type))
+            options.content_type = "application/octet-stream" 
+        end
         
     elseif isa(data, Tuple)
         (typsym, filename) = data
@@ -357,7 +366,9 @@ function put_post(url::String, data, putorpost::Symbol, options::RequestOptions)
         rd.sz = filesize(filename)
 
         try
-            if (options.content_type == "") options.content_type = get_ct_from_ext(filename) end
+            if ((options.content_type == "") && (options.auto_content_type))
+                options.content_type = get_ct_from_ext(filename) 
+            end
             return _put_post(url, putorpost, options, rd)
         finally
             close(rd.src)
@@ -479,9 +490,11 @@ function urlencode_query_params(curl, params::Vector{Tuple})
                     ep
                 end,
                 
-            (ep1,ep2) -> ep1 * "&" * ep2,
+            (ep1,ep2) -> ep1 == "" ? ep2 :
+                       ep2 == "" ? ep1 :
+                       ep1 * "&" * ep2,
             
-            params
+            "", params
     )
     
     return querystr
@@ -523,7 +536,9 @@ function exec_as_multi(ctxt)
         n_active = Array(Int,1)
         n_active[1] = 1
         now  = int64(time()*1000)
-        till = now + int64(ctxt.options.request_timeout * 1000) + 1
+        
+        timeout_to_use = (ctxt.options.request_timeout) == 0.0 ? (30 * 24 * 3600.0) : ctxt.options.request_timeout
+        till = now + int64(timeout_to_use * 1000) + 1
         
         cmc = curl_multi_perform(curlm, n_active);
         while (n_active[1] > 0) && ((till - now) > 0)
