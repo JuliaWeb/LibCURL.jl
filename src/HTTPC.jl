@@ -3,7 +3,7 @@ module HTTPC
 using libCURL
 using libCURL.Mime_ext
 
-export init, cleanup, get, put, put_file, post, post_file, trace, delete, head, options
+export init, cleanup, get, put, post, trace, delete, head, options
 
 
 export RequestOptions, Response
@@ -47,8 +47,8 @@ type ReadData
     typ::Symbol
     src::Any
     str::String
-    offset::Int
-    sz::Int
+    offset::Csize_t
+    sz::Csize_t
 
     ReadData() = new(:undefined, false, "", 0, 0)
 end
@@ -112,8 +112,8 @@ function curl_read_cb(out::Ptr{Void}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
 #    println("@curl_read_cb")
 
     ctxt = unsafe_pointer_to_objref(p_ctxt)
-    bavail = s * n
-    breq = ctxt.rd.sz - ctxt.rd.offset
+    bavail::Csize_t = s * n
+    breq::Csize_t = ctxt.rd.sz - ctxt.rd.offset
     b2copy = bavail > breq ? breq : bavail
 
     if (ctxt.rd.typ == :buffer)
@@ -347,7 +347,7 @@ function put_post(url::String, data, putorpost::Symbol, options::RequestOptions)
             options.content_type = "application/x-www-form-urlencoded" 
         end
         
-    elseif isa(data, IOStream)
+    elseif isa(data, IO)
         rd.typ = :io
         rd.src = data
         seekend(data)    

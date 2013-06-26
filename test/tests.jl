@@ -105,7 +105,7 @@ r=HTTPC.post(RB * "?test=6.1.1", [("a",1), ("b",2)])
 @test r.http_code == 200
 println("Test 6.1.1 passed, http_code : " * string(r.http_code))
 
-ios = memio(32)
+ios = IOBuffer()
 write(ios, "Hello World!")
 seekstart(ios)
 r=HTTPC.post(RB * "?test=6.2", ios)
