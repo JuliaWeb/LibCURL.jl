@@ -1,4 +1,4 @@
-module libCURL
+module LibCURL
 
 typealias time_t Int
 typealias size_t Csize_t
@@ -28,8 +28,5 @@ include("lC_defines_h.jl")
 
 include("Mime_ext.jl")
 export Mime_ext
-
-include("HTTPC.jl")
-export HTTPC
 
 end
