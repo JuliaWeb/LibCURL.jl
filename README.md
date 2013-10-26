@@ -26,6 +26,6 @@ Mime_ext.jl is generated from /etc/mime.types and maps common file extensions to
 Usage
 =====
 
-HTTPClient.HTTPC makes use of LibCURL
+HTTPClient.HTTPC and [SMTPClient.jl](https://github.com/aviks/SMTPClient.jl/) makes use of LibCURL
 
 
