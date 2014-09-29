@@ -4,7 +4,7 @@
 @c Cint curl_strequal (Ptr{Uint8}, Ptr{Uint8}) libcurl
 @c Cint curl_strnequal (Ptr{Uint8}, Ptr{Uint8}, size_t) libcurl
 @c CURLFORMcode curl_formadd (Ptr{Ptr{Void}}, Ptr{Ptr{Void}}) libcurl
-@c Cint curl_formget (Ptr{Void}, Ptr{None}, curl_formget_callback) libcurl
+@c Cint curl_formget (Ptr{Void}, Ptr{Void}, curl_formget_callback) libcurl
 @c None curl_formfree (Ptr{Void},) libcurl
 @c Ptr{Uint8} curl_getenv (Ptr{Uint8},) libcurl
 @c Ptr{Uint8} curl_version () libcurl
@@ -12,7 +12,7 @@
 @c Ptr{Uint8} curl_escape (Ptr{Uint8}, Cint) libcurl
 @c Ptr{Uint8} curl_easy_unescape (Ptr{CURL}, Ptr{Uint8}, Cint, Ptr{Cint}) libcurl
 @c Ptr{Uint8} curl_unescape (Ptr{Uint8}, Cint) libcurl
-@c None curl_free (Ptr{None},) libcurl
+@c None curl_free (Ptr{Void},) libcurl
 @c CURLcode curl_global_init (Cint,) libcurl
 @c CURLcode curl_global_init_mem (Cint, curl_malloc_callback, curl_free_callback, curl_realloc_callback, curl_strdup_callback, curl_calloc_callback) libcurl
 @c None curl_global_cleanup () libcurl
@@ -33,8 +33,8 @@
 @c CURLcode curl_easy_getinfo (Ptr{CURL}, CURLINFO) libcurl
 @c Ptr{CURL} curl_easy_duphandle (Ptr{CURL},) libcurl
 @c None curl_easy_reset (Ptr{CURL},) libcurl
-@c CURLcode curl_easy_recv (Ptr{CURL}, Ptr{None}, size_t, Ptr{size_t}) libcurl
-@c CURLcode curl_easy_send (Ptr{CURL}, Ptr{None}, size_t, Ptr{size_t}) libcurl
+@c CURLcode curl_easy_recv (Ptr{CURL}, Ptr{Void}, size_t, Ptr{size_t}) libcurl
+@c CURLcode curl_easy_send (Ptr{CURL}, Ptr{Void}, size_t, Ptr{size_t}) libcurl
 @c Ptr{CURLM} curl_multi_init () libcurl
 @c CURLMcode curl_multi_add_handle (Ptr{CURLM}, Ptr{CURL}) libcurl
 @c CURLMcode curl_multi_remove_handle (Ptr{CURLM}, Ptr{CURL}) libcurl
