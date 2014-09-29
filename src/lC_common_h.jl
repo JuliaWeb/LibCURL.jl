@@ -26,7 +26,7 @@ type curl_httppost
   more::Ptr{Void}
   flags::Int32
   showfilename::Ptr{Uint8}
-  userp::Ptr{None}
+  userp::Ptr{Void}
 end
 @ctypedef curl_progress_callback Ptr{Void}
 @ctypedef curl_write_callback Ptr{Void}
