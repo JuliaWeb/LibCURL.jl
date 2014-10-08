@@ -2,7 +2,7 @@ module Mime_ext
 
 export MimeExt
 
-MimeExt = {
+MimeExt = Dict{String, String}(
   "ez" => "application/andrew-inset",
   "anx" => "application/annodex",
   "atom" => "application/atom+xml",
@@ -541,6 +541,6 @@ MimeExt = {
   "vrml" => "x-world/x-vrml",
   "wrl" => "x-world/x-vrml",
   "" => ""
-}
+)
 
 end
