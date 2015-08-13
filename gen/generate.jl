@@ -1,20 +1,31 @@
 using Clang.cindex
 using Clang.wrap_c
 
-JULIAHOME=EnvHash()["JULIAHOME"]
+JULIAHOME = abspath("$JULIA_HOME/../../")
+LLVMVER = "3.3"
 
 clang_includes = map(x->joinpath(JULIAHOME, x), [
-  "deps/llvm-3.2/build/Release/lib/clang/3.2/include",
-  "deps/llvm-3.2/include",
-  "deps/llvm-3.2/include",
-  "deps/llvm-3.2/build/include/",
-  "deps/llvm-3.2/include/"
+  "deps/llvm-$LLVMVER/build/Release/lib/clang/$LLVMVER/include",
+  "deps/llvm-$LLVMVER/include",
+  "deps/llvm-$LLVMVER/include",
+  "deps/llvm-$LLVMVER/build/include/",
+  "deps/llvm-$LLVMVER/include/"
   ])
 clang_extraargs = ["-D", "__STDC_LIMIT_MACROS", "-D", "__STDC_CONSTANT_MACROS"]
 
 wrap_hdrs = map( x-> joinpath("/usr/include/curl", x), [ "curl.h", "easy.h", "multi.h" ])
 
-wc = wrap_c.init(".", "../src/lC_common_h.jl", clang_includes, clang_extraargs, (th, h) -> contains(wrap_hdrs, h) , h -> "libcurl", h -> "../src/lC_" * replace(last(split(h, "/")), ".", "_")  * ".jl" )
+
+wc = wrap_c.init(;
+                CommonFile = "../src/lC_common_h.jl",
+                ClangIncludes = clang_includes,
+                ClangArgs   = clang_extraargs,
+                header_wrapped = (th, h) -> contains(wrap_hdrs, h),
+                header_library = h -> "libcurl",
+                header_outputfile = h -> "../src/lC_" *replace(last(split(h, "/")), ".", "_") * ".jl"
+                )
+
+
 wc.options.wrap_structs = true
 
 wrap_c.wrap_c_headers(wc, ["/usr/include/curl/curl.h"])
