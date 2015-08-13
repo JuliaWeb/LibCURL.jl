@@ -1,0 +1,17 @@
+language: julia
+os:
+    - linux
+    - osx
+julia:
+    - release
+    - nightly
+notifications:
+    email: false
+sudo: false
+script:
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia -e 'Pkg.clone(pwd())'
+    - julia -e 'Pkg.test("LibCURL", coverage=true)'
+after_success:
+    - julia -e 'cd(Pkg.dir("LibCURL")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+
