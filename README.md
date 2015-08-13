@@ -2,6 +2,7 @@
 ### Thin Julia wrapper for libCURL
 
 [![Build Status](https://travis-ci.org/JuliaWeb/LibCURL.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/LibCURL.jl)
+[![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
 
 Installation: `julia> Pkg.add("LibCURL.jl")`
 
