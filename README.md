@@ -4,6 +4,9 @@
 [![Build Status](https://travis-ci.org/JuliaWeb/LibCURL.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/LibCURL.jl)
 [![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
 
+[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.3.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.3)
+[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.4.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.4)
+
 Installation: `julia> Pkg.add("LibCURL.jl")`
 
 ---
