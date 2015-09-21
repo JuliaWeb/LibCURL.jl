@@ -11,21 +11,21 @@ macro ctypedef(fake_t,real_t)
   end
 end
 
-@ctypedef CURL None
+@ctypedef CURL Union{}
 @ctypedef curl_socket_t Int32
 type curl_httppost
   next::Ptr{Void}
-  name::Ptr{Uint8}
+  name::Ptr{UInt8}
   namelength::Int32
-  contents::Ptr{Uint8}
+  contents::Ptr{UInt8}
   contentslength::Int32
-  buffer::Ptr{Uint8}
+  buffer::Ptr{UInt8}
   bufferlength::Int32
-  contenttype::Ptr{Uint8}
+  contenttype::Ptr{UInt8}
   contentheader::Ptr{Void}
   more::Ptr{Void}
   flags::Int32
-  showfilename::Ptr{Uint8}
+  showfilename::Ptr{UInt8}
   userp::Ptr{Void}
 end
 @ctypedef curl_progress_callback Ptr{Void}
@@ -43,17 +43,17 @@ const CURLFILETYPE_UNKNOWN = 8
 # end
 @ctypedef curlfiletype Int32
 type curl_fileinfo
-  filename::Ptr{Uint8}
+  filename::Ptr{UInt8}
   filetype::curlfiletype
   time::time_t
-  perm::Uint32
+  perm::UInt32
   uid::Int32
   gid::Int32
   size::curl_off_t
   hardlinks::Int32
   strings::Void
-  flags::Uint32
-  b_data::Ptr{Uint8}
+  flags::UInt32
+  b_data::Ptr{UInt8}
   b_size::size_t
   b_used::size_t
 end
@@ -72,7 +72,7 @@ type curl_sockaddr
   family::Int32
   socktype::Int32
   protocol::Int32
-  addrlen::Uint32
+  addrlen::UInt32
   addr::Void
 end
 @ctypedef curl_opensocket_callback Ptr{Void}
@@ -213,7 +213,7 @@ const CURLPROXY_SOCKS5_HOSTNAME = 7
 # end
 @ctypedef curl_proxytype Int32
 type curl_khkey
-  key::Ptr{Uint8}
+  key::Ptr{UInt8}
   len::size_t
   keytype::Int32
 end
@@ -522,7 +522,7 @@ const CURLFORM_LASTENTRY = 20
 @ctypedef CURLformoption Int32
 type curl_forms
   option::CURLformoption
-  value::Ptr{Uint8}
+  value::Ptr{UInt8}
 end
 # enum CURLFORMcode
 const CURL_FORMADD_OK = 0
@@ -538,7 +538,7 @@ const CURL_FORMADD_LAST = 8
 @ctypedef CURLFORMcode Int32
 @ctypedef curl_formget_callback Ptr{Void}
 type curl_slist
-  data::Ptr{Uint8}
+  data::Ptr{UInt8}
   next::Ptr{Void}
 end
 type curl_certinfo
@@ -621,7 +621,7 @@ const CURL_LOCK_ACCESS_LAST = 3
 @ctypedef curl_lock_access Int32
 @ctypedef curl_lock_function Ptr{Void}
 @ctypedef curl_unlock_function Ptr{Void}
-@ctypedef CURLSH None
+@ctypedef CURLSH Union{}
 # enum CURLSHcode
 const CURLSHE_OK = 0
 const CURLSHE_BAD_OPTION = 1
@@ -652,21 +652,21 @@ const CURLVERSION_LAST = 4
 @ctypedef CURLversion Int32
 type curl_version_info_data
   age::CURLversion
-  version::Ptr{Uint8}
-  version_num::Uint32
-  host::Ptr{Uint8}
+  version::Ptr{UInt8}
+  version_num::UInt32
+  host::Ptr{UInt8}
   features::Int32
-  ssl_version::Ptr{Uint8}
+  ssl_version::Ptr{UInt8}
   ssl_version_num::Int32
-  libz_version::Ptr{Uint8}
-  protocols::Ptr{Ptr{Uint8}}
-  ares::Ptr{Uint8}
+  libz_version::Ptr{UInt8}
+  protocols::Ptr{Ptr{UInt8}}
+  ares::Ptr{UInt8}
   ares_num::Int32
-  libidn::Ptr{Uint8}
+  libidn::Ptr{UInt8}
   iconv_ver_num::Int32
-  libssh_version::Ptr{Uint8}
+  libssh_version::Ptr{UInt8}
 end
-@ctypedef CURLM None
+@ctypedef CURLM Union{}
 # enum CURLMcode
 const CURLM_CALL_MULTI_PERFORM = -1
 const CURLM_OK = 0

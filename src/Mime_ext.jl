@@ -2,7 +2,7 @@ module Mime_ext
 
 export MimeExt
 
-MimeExt = Dict{String, String}(
+MimeExt = Dict{AbstractString,AbstractString}(
   "ez" => "application/andrew-inset",
   "anx" => "application/annodex",
   "atom" => "application/atom+xml",
