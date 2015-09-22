@@ -29,17 +29,10 @@
 @c Ptr{CURL} curl_easy_init () libcurl
 @c CURLcode curl_easy_setopt (Ptr{CURL}, CURLoption) libcurl
 @c CURLcode curl_easy_perform (Ptr{CURL},) libcurl
-<<<<<<< HEAD
 @c Void curl_easy_cleanup (Ptr{CURL},) libcurl
 @c CURLcode curl_easy_getinfo (Ptr{CURL}, CURLINFO) libcurl
 @c Ptr{CURL} curl_easy_duphandle (Ptr{CURL},) libcurl
 @c Void curl_easy_reset (Ptr{CURL},) libcurl
-=======
-@c Union{} curl_easy_cleanup (Ptr{CURL},) libcurl
-@c CURLcode curl_easy_getinfo (Ptr{CURL}, CURLINFO) libcurl
-@c Ptr{CURL} curl_easy_duphandle (Ptr{CURL},) libcurl
-@c Union{} curl_easy_reset (Ptr{CURL},) libcurl
->>>>>>> julia 0.4 changes
 @c CURLcode curl_easy_recv (Ptr{CURL}, Ptr{Void}, size_t, Ptr{size_t}) libcurl
 @c CURLcode curl_easy_send (Ptr{CURL}, Ptr{Void}, size_t, Ptr{size_t}) libcurl
 @c Ptr{CURLM} curl_multi_init () libcurl
@@ -55,9 +48,5 @@
 @c CURLMcode curl_multi_socket_all (Ptr{CURLM}, Ptr{Cint}) libcurl
 @c CURLMcode curl_multi_timeout (Ptr{CURLM}, Ptr{Cint}) libcurl
 @c CURLMcode curl_multi_setopt (Ptr{CURLM}, CURLMoption) libcurl
-<<<<<<< HEAD
 @c CURLMcode curl_multi_assign (Ptr{CURLM}, curl_socket_t, Ptr{Void}) libcurl
-=======
-@c CURLMcode curl_multi_assign (Ptr{CURLM}, curl_socket_t, Ptr{Union{}}) libcurl
->>>>>>> julia 0.4 changes
 
