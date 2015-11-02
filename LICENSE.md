@@ -1,7 +1,6 @@
-HTTPClient.jl is licensed under the MIT License:
+LibCURL.jl is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2013: Amit Murthy
-> and other contributors: https://github.com/amitmurthy/HTTPClient.jl/contributors
+> Copyright (c) 2013: JuliaWeb contributors
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
