@@ -1,3 +1,5 @@
+isdefined(Base, :__precompile__) && __precompile__()
+
 module LibCURL
 
 typealias time_t Int
