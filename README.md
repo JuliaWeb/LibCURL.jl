@@ -2,6 +2,7 @@
 ### Thin Julia wrapper for libCURL
 
 [![Build Status](https://travis-ci.org/JuliaWeb/LibCURL.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/LibCURL.jl)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/github/JuliaWeb/LibCurl.jl)](https://ci.appveyor.com/project/shashi/libcurl-jl)
 [![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
 
 [![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.3.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.3)
