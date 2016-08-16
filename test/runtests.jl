@@ -1,4 +1,5 @@
 using LibCURL
+using Compat
 
 # Just testing loading of the library and a simple library call.
 curl = curl_easy_init()
