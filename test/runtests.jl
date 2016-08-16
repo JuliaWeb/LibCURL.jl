@@ -6,7 +6,7 @@ curl == C_NULL && error("curl_easy_init() failed")
 
 function testescape(s, esc_s)
     b_arr = curl_easy_escape(curl, s, sizeof(s))
-    bytestring(b_arr) != esc_s && error("escaping $s failed")
+    unsafe_string(b_arr) != esc_s && error("escaping $s failed")
     curl_free(b_arr)
 end
 
