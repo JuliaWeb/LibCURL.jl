@@ -2,6 +2,8 @@ isdefined(Base, :__precompile__) && __precompile__()
 
 module LibCURL
 
+import Compat: is_windows
+
 typealias time_t Int
 typealias size_t Csize_t
 typealias curl_off_t Int64
@@ -9,8 +11,11 @@ typealias curl_off_t Int64
 include("lC_exports_h.jl")
 include("lC_common_h.jl")
 
-@unix_only const libcurl = "libcurl"
-@windows_only const libcurl = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin","libcurl-4")
+const libcurl = if is_windows()
+    Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin","libcurl-4")
+else
+    "libcurl"
+end
 
 include("lC_curl_h.jl")
 
