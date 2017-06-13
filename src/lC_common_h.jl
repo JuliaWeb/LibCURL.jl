@@ -7,7 +7,7 @@ end
 
 macro ctypedef(fake_t,real_t)
   quote
-    typealias $fake_t $real_t
+    const $fake_t = $real_t
   end
 end
 
