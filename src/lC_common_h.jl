@@ -702,3 +702,4 @@ const CURLMOPT_MAXCONNECTS = 6
 const CURLMOPT_LASTENTRY = 7
 # end
 @ctypedef CURLMoption Int32
+@ctypedef fd_set Union{}
