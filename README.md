@@ -24,18 +24,18 @@ curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1)
 
 
 # setup the callback function to recv data
-function curl_read_cb(curlbuf::Ptr{Void}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
+function curl_write_cb(curlbuf::Ptr{Void}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
     sz = s * n
     data = Array(UInt8, sz)
-
-    ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), curlbuf, data, sz)
-    println("recd: ", bytestring(data))
-
+    
+    ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), data, curlbuf, sz)
+    println("recd: ", String(copy(data)))
+    
     sz::Csize_t
 end
 
-c_curl_read_cb = cfunction(curl_read_cb, Csize_t, (Ptr{Void}, Csize_t, Csize_t, Ptr{Void}))
-curl_easy_setopt(curl, CURLOPT_READFUNCTION, c_curl_read_cb)
+c_curl_write_cb = cfunction(curl_write_cb, Csize_t, (Ptr{Void}, Csize_t, Csize_t, Ptr{Void}))
+curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, c_curl_write_cb)
 
 
 # execute the query
