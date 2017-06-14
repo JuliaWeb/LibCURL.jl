@@ -4,9 +4,9 @@ module LibCURL
 
 import Compat: is_windows
 
-typealias time_t Int
-typealias size_t Csize_t
-typealias curl_off_t Int64
+const time_t = Int
+const size_t = Csize_t
+const curl_off_t = Int64
 
 include("lC_exports_h.jl")
 include("lC_common_h.jl")

@@ -7,7 +7,7 @@ end
 
 macro ctypedef(fake_t,real_t)
   quote
-    typealias $fake_t $real_t
+    const $(esc(fake_t)) = $(esc(real_t))
   end
 end
 
@@ -702,3 +702,4 @@ const CURLMOPT_MAXCONNECTS = 6
 const CURLMOPT_LASTENTRY = 7
 # end
 @ctypedef CURLMoption Int32
+@ctypedef fd_set Union{}
