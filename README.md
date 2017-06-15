@@ -1,18 +1,22 @@
-# LibCURL.jl
-### Thin Julia wrapper for libCURL
+LibCURL.jl
+==========
+
+*Julia wrapper for libCURL*
 
 [![Build Status](https://travis-ci.org/JuliaWeb/LibCURL.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/LibCURL.jl)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/github/JuliaWeb/LibCurl.jl)](https://ci.appveyor.com/project/shashi/libcurl-jl)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/github/JuliaWeb/LibCurl.jl?svg=true)](https://ci.appveyor.com/project/shashi/libcurl-jl)
 [![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
 
-[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.3.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.3)
 [![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.4.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.4)
+[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.5.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.5)
+[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.6.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.6)
 
 ---
-This is a simple Julia wrapper around http://curl.haxx.se/libcurl/ generated using Clang (https://github.com/ihnorton/Clang.jl)
+This is a simple Julia wrapper around http://curl.haxx.se/libcurl/ generated using [Clang.jl](https://github.com/ihnorton/Clang.jl).
 
-###Example (fetch a URL)
-```
+### Example (fetch a URL)
+
+```julia
 using LibCURL
 
 # init a curl handle
@@ -26,10 +30,10 @@ curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1)
 # setup the callback function to recv data
 function curl_write_cb(curlbuf::Ptr{Void}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
     sz = s * n
-    data = Array(UInt8, sz)
+    data = Array{UInt8}(sz)
     
     ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), data, curlbuf, sz)
-    println("recd: ", String(copy(data)))
+    println("recd: ", String(data))
     
     sz::Csize_t
 end
@@ -43,7 +47,7 @@ res = curl_easy_perform(curl)
 println("curl url exec response : ", res)
 
 # retrieve HTTP code
-http_code = Array(Clong,1)
+http_code = Array{Clong}(1)
 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, http_code)
 println("httpcode : ", http_code)
 
