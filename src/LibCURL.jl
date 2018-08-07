@@ -2,8 +2,6 @@ isdefined(Base, :__precompile__) && __precompile__()
 
 module LibCURL
 
-import Compat: is_windows
-
 const time_t = Int
 const size_t = Csize_t
 const curl_off_t = Int64
