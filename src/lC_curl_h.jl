@@ -3,21 +3,21 @@
 
 @c Cint curl_strequal (Ptr{UInt8}, Ptr{UInt8}) libcurl
 @c Cint curl_strnequal (Ptr{UInt8}, Ptr{UInt8}, size_t) libcurl
-@c CURLFORMcode curl_formadd (Ptr{Ptr{Nothing}}, Ptr{Ptr{Nothing}}) libcurl
-@c Cint curl_formget (Ptr{Nothing}, Ptr{Nothing}, curl_formget_callback) libcurl
-@c Nothing curl_formfree (Ptr{Nothing},) libcurl
+@c CURLFORMcode curl_formadd (Ptr{Ptr{Cvoid}}, Ptr{Ptr{Nothing}}) libcurl
+@c Cint curl_formget (Ptr{Cvoid}, Ptr{Nothing}, curl_formget_callback) libcurl
+@c Cvoid curl_formfree (Ptr{Nothing},) libcurl
 @c Ptr{UInt8} curl_getenv (Ptr{UInt8},) libcurl
 @c Ptr{UInt8} curl_version () libcurl
 @c Ptr{UInt8} curl_easy_escape (Ptr{CURL}, Ptr{UInt8}, Cint) libcurl
 @c Ptr{UInt8} curl_escape (Ptr{UInt8}, Cint) libcurl
 @c Ptr{UInt8} curl_easy_unescape (Ptr{CURL}, Ptr{UInt8}, Cint, Ptr{Cint}) libcurl
 @c Ptr{UInt8} curl_unescape (Ptr{UInt8}, Cint) libcurl
-@c Nothing curl_free (Ptr{Nothing},) libcurl
+@c Cvoid curl_free (Ptr{Nothing},) libcurl
 @c CURLcode curl_global_init (Cint,) libcurl
 @c CURLcode curl_global_init_mem (Cint, curl_malloc_callback, curl_free_callback, curl_realloc_callback, curl_strdup_callback, curl_calloc_callback) libcurl
-@c Nothing curl_global_cleanup () libcurl
-@c Ptr{Nothing} curl_slist_append (Ptr{Nothing}, Ptr{UInt8}) libcurl
-@c Nothing curl_slist_free_all (Ptr{Nothing},) libcurl
+@c Cvoid curl_global_cleanup () libcurl
+@c Ptr{Cvoid} curl_slist_append (Ptr{Nothing}, Ptr{UInt8}) libcurl
+@c Cvoid curl_slist_free_all (Ptr{Nothing},) libcurl
 @c time_t curl_getdate (Ptr{UInt8}, Ptr{time_t}) libcurl
 @c Ptr{CURLSH} curl_share_init () libcurl
 @c CURLSHcode curl_share_setopt (Ptr{CURLSH}, CURLSHoption) libcurl
@@ -29,12 +29,12 @@
 @c Ptr{CURL} curl_easy_init () libcurl
 @c CURLcode curl_easy_setopt (Ptr{CURL}, CURLoption) libcurl
 @c CURLcode curl_easy_perform (Ptr{CURL},) libcurl
-@c Nothing curl_easy_cleanup (Ptr{CURL},) libcurl
+@c Cvoid curl_easy_cleanup (Ptr{CURL},) libcurl
 @c CURLcode curl_easy_getinfo (Ptr{CURL}, CURLINFO) libcurl
 @c Ptr{CURL} curl_easy_duphandle (Ptr{CURL},) libcurl
-@c Nothing curl_easy_reset (Ptr{CURL},) libcurl
-@c CURLcode curl_easy_recv (Ptr{CURL}, Ptr{Nothing}, size_t, Ptr{size_t}) libcurl
-@c CURLcode curl_easy_send (Ptr{CURL}, Ptr{Nothing}, size_t, Ptr{size_t}) libcurl
+@c Cvoid curl_easy_reset (Ptr{CURL},) libcurl
+@c CURLcode curl_easy_recv (Ptr{CURL}, Ptr{Cvoid}, size_t, Ptr{size_t}) libcurl
+@c CURLcode curl_easy_send (Ptr{CURL}, Ptr{Cvoid}, size_t, Ptr{size_t}) libcurl
 @c Ptr{CURLM} curl_multi_init () libcurl
 @c CURLMcode curl_multi_add_handle (Ptr{CURLM}, Ptr{CURL}) libcurl
 @c CURLMcode curl_multi_remove_handle (Ptr{CURLM}, Ptr{CURL}) libcurl
@@ -48,5 +48,5 @@
 @c CURLMcode curl_multi_socket_all (Ptr{CURLM}, Ptr{Cint}) libcurl
 @c CURLMcode curl_multi_timeout (Ptr{CURLM}, Ptr{Cint}) libcurl
 @c CURLMcode curl_multi_setopt (Ptr{CURLM}, CURLMoption) libcurl
-@c CURLMcode curl_multi_assign (Ptr{CURLM}, curl_socket_t, Ptr{Nothing}) libcurl
+@c CURLMcode curl_multi_assign (Ptr{CURLM}, curl_socket_t, Ptr{Cvoid}) libcurl
 
