@@ -1,5 +1,6 @@
 environment:
   matrix:
+  - julia_version: 0.6
   - julia_version: 0.7
   - julia_version: 1.0
   - julia_version: latest
@@ -23,10 +24,9 @@ install:
   - ps: iex ((new-object net.webclient).DownloadString("https://raw.githubusercontent.com/JuliaCI/Appveyor.jl/version-1/bin/install.ps1"))
 
 build_script:
-# Need to convert from shallow to complete for Pkg.clone to work
-  - IF EXIST .git\shallow (git fetch --unshallow)
-  - C:\julia\bin\julia -e "versioninfo(); import Pkg;
-      Pkg.clone(pwd(), \"LibCURL\"); Pkg.build(\"LibCURL\")"
+  - echo "%JL_BUILD_SCRIPT%"
+  - C:\julia\bin\julia -e "%JL_BUILD_SCRIPT%"
 
 test_script:
-  - C:\julia\bin\julia -e "import Pkg; Pkg.test(\"LibCURL\")"
+  - echo "%JL_TEST_SCRIPT%"
+  - C:\julia\bin\julia -e "%JL_TEST_SCRIPT%"

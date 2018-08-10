@@ -3,21 +3,21 @@
 
 @c Cint curl_strequal (Ptr{UInt8}, Ptr{UInt8}) libcurl
 @c Cint curl_strnequal (Ptr{UInt8}, Ptr{UInt8}, size_t) libcurl
-@c CURLFORMcode curl_formadd (Ptr{Ptr{Cvoid}}, Ptr{Ptr{Nothing}}) libcurl
-@c Cint curl_formget (Ptr{Cvoid}, Ptr{Nothing}, curl_formget_callback) libcurl
-@c Cvoid curl_formfree (Ptr{Nothing},) libcurl
+@c CURLFORMcode curl_formadd (Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}) libcurl
+@c Cint curl_formget (Ptr{Cvoid}, Ptr{Cvoid}, curl_formget_callback) libcurl
+@c Cvoid curl_formfree (Ptr{Cvoid},) libcurl
 @c Ptr{UInt8} curl_getenv (Ptr{UInt8},) libcurl
 @c Ptr{UInt8} curl_version () libcurl
 @c Ptr{UInt8} curl_easy_escape (Ptr{CURL}, Ptr{UInt8}, Cint) libcurl
 @c Ptr{UInt8} curl_escape (Ptr{UInt8}, Cint) libcurl
 @c Ptr{UInt8} curl_easy_unescape (Ptr{CURL}, Ptr{UInt8}, Cint, Ptr{Cint}) libcurl
 @c Ptr{UInt8} curl_unescape (Ptr{UInt8}, Cint) libcurl
-@c Cvoid curl_free (Ptr{Nothing},) libcurl
+@c Cvoid curl_free (Ptr{Cvoid},) libcurl
 @c CURLcode curl_global_init (Cint,) libcurl
 @c CURLcode curl_global_init_mem (Cint, curl_malloc_callback, curl_free_callback, curl_realloc_callback, curl_strdup_callback, curl_calloc_callback) libcurl
 @c Cvoid curl_global_cleanup () libcurl
-@c Ptr{Cvoid} curl_slist_append (Ptr{Nothing}, Ptr{UInt8}) libcurl
-@c Cvoid curl_slist_free_all (Ptr{Nothing},) libcurl
+@c Ptr{Cvoid} curl_slist_append (Ptr{Cvoid}, Ptr{UInt8}) libcurl
+@c Cvoid curl_slist_free_all (Ptr{Cvoid},) libcurl
 @c time_t curl_getdate (Ptr{UInt8}, Ptr{time_t}) libcurl
 @c Ptr{CURLSH} curl_share_init () libcurl
 @c CURLSHcode curl_share_setopt (Ptr{CURLSH}, CURLSHoption) libcurl

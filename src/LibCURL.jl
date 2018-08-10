@@ -1,8 +1,8 @@
-isdefined(Base, :__precompile__) && __precompile__()
+VERSION < v"0.7.0-beta2.199" && __precompile__()
 
 module LibCURL
 
-import Compat.Sys: iswindows
+import Compat: Sys, Cvoid
 
 const time_t = Int
 const size_t = Csize_t
@@ -11,7 +11,7 @@ const curl_off_t = Int64
 include("lC_exports_h.jl")
 include("lC_common_h.jl")
 
-const libcurl = if iswindows()
+const libcurl = if Sys.iswindows()
     Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin","libcurl-4")
 else
     "libcurl"
@@ -26,7 +26,7 @@ curl_easy_setopt(handle, opt, ptrval::AbstractString) = ccall((:curl_easy_setopt
 
 curl_multi_setopt(handle, opt, ptrval::Array) = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Ptr{Cvoid}), handle, opt, pointer(ptrval))
 curl_multi_setopt(handle, opt, ptrval::Integer) = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Clong), handle, opt, ptrval)
-curl_multi_setopt(handle, opt, ptrval::T) where {T} = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, T), handle, opt, ptrval)
+curl_multi_setopt(handle, opt, ptrval::Ptr{T}) where {T} = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Ptr{T}), handle, opt, ptrval)
 curl_multi_setopt(handle, opt, ptrval::AbstractString) = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Ptr{UInt8}), handle, opt, ptrval)
 
 curl_easy_getinfo(handle, opt, ptrval::Array) = ccall((:curl_easy_getinfo, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{Cvoid}), handle, opt, pointer(ptrval))

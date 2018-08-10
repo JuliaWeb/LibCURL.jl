@@ -68,7 +68,7 @@ const CURLSOCKTYPE_LAST = 1
 # end
 @ctypedef curlsocktype Int32
 @ctypedef curl_sockopt_callback Ptr{Cvoid}
-struct curl_sockaddr
+mutable struct curl_sockaddr
   family::Int32
   socktype::Int32
   protocol::Int32
