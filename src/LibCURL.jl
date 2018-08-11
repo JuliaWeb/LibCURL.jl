@@ -2,7 +2,7 @@ isdefined(Base, :__precompile__) && __precompile__()
 
 module LibCURL
 
-import Compat: is_windows
+import Compat: Sys.iswindows
 
 const time_t = Int
 const size_t = Csize_t
@@ -11,7 +11,7 @@ const curl_off_t = Int64
 include("lC_exports_h.jl")
 include("lC_common_h.jl")
 
-const libcurl = if is_windows()
+const libcurl = if Sys.iswindows()
     Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin","libcurl-4")
 else
     "libcurl"

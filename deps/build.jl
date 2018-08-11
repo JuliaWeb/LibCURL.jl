@@ -1,9 +1,9 @@
 using BinDeps
-import Compat: is_windows
+import Compat: Sys.iswindows
 
 @BinDeps.setup
 
-if is_windows()
+if Sys.iswindows()
     # note that there is a 32-bit version of libcurl.dll
     # included with Git, which will not work with 64 bit Julia
 
