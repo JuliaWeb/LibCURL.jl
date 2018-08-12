@@ -8,21 +8,19 @@ const time_t = Int
 const size_t = Csize_t
 const curl_off_t = Int64
 
-include("lC_exports_h.jl")
-include("lC_common_h.jl")
+# Load libcurl libraries from our deps.jl
+const depsjl_path = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
+if !isfile(depsjl_path)
+    error("LibCURL not installed properly, run Pkg.build(\"LibCURL\"), restart Julia and try again")
+end
+include(depsjl_path)
 
-const libcurl = if Sys.iswindows()
-    dir = if VERSION >= v"0.7"
-        import WinRPM
-        joinpath(dirname(pathof(WinRPM)), "..")
-    else
-        Pkg.dir("WinRPM")
-    end
-    joinpath(dir,"deps","usr","$(Base.Sys.ARCH)-w64-mingw32","sys-root","mingw","bin","libcurl-4")
-else
-    "libcurl"
+function __init__()
+    check_deps()  # Always check your dependencies from `deps.jl`
 end
 
+include("lC_exports_h.jl")
+include("lC_common_h.jl")
 include("lC_curl_h.jl")
 
 curl_easy_setopt(handle, opt, ptrval::Array) = ccall((:curl_easy_setopt, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{Cvoid}), handle, opt, pointer(ptrval))
