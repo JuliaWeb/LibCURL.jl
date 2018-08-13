@@ -13,8 +13,8 @@ end
 
 @ctypedef CURL Union{}
 @ctypedef curl_socket_t Int32
-type curl_httppost
-  next::Ptr{Void}
+mutable struct curl_httppost
+  next::Ptr{Cvoid}
   name::Ptr{UInt8}
   namelength::Int32
   contents::Ptr{UInt8}
@@ -22,14 +22,14 @@ type curl_httppost
   buffer::Ptr{UInt8}
   bufferlength::Int32
   contenttype::Ptr{UInt8}
-  contentheader::Ptr{Void}
-  more::Ptr{Void}
+  contentheader::Ptr{Cvoid}
+  more::Ptr{Cvoid}
   flags::Int32
   showfilename::Ptr{UInt8}
-  userp::Ptr{Void}
+  userp::Ptr{Cvoid}
 end
-@ctypedef curl_progress_callback Ptr{Void}
-@ctypedef curl_write_callback Ptr{Void}
+@ctypedef curl_progress_callback Ptr{Cvoid}
+@ctypedef curl_write_callback Ptr{Cvoid}
 # enum curlfiletype
 const CURLFILETYPE_FILE = 0
 const CURLFILETYPE_DIRECTORY = 1
@@ -42,7 +42,7 @@ const CURLFILETYPE_DOOR = 7
 const CURLFILETYPE_UNKNOWN = 8
 # end
 @ctypedef curlfiletype Int32
-type curl_fileinfo
+mutable struct curl_fileinfo
   filename::Ptr{UInt8}
   filetype::curlfiletype
   time::time_t
@@ -51,32 +51,32 @@ type curl_fileinfo
   gid::Int32
   size::curl_off_t
   hardlinks::Int32
-  strings::Void
+  strings::Cvoid
   flags::UInt32
   b_data::Ptr{UInt8}
   b_size::size_t
   b_used::size_t
 end
-@ctypedef curl_chunk_bgn_callback Ptr{Void}
-@ctypedef curl_chunk_end_callback Ptr{Void}
-@ctypedef curl_fnmatch_callback Ptr{Void}
-@ctypedef curl_seek_callback Ptr{Void}
-@ctypedef curl_read_callback Ptr{Void}
+@ctypedef curl_chunk_bgn_callback Ptr{Cvoid}
+@ctypedef curl_chunk_end_callback Ptr{Cvoid}
+@ctypedef curl_fnmatch_callback Ptr{Cvoid}
+@ctypedef curl_seek_callback Ptr{Cvoid}
+@ctypedef curl_read_callback Ptr{Cvoid}
 # enum curlsocktype
 const CURLSOCKTYPE_IPCXN = 0
 const CURLSOCKTYPE_LAST = 1
 # end
 @ctypedef curlsocktype Int32
-@ctypedef curl_sockopt_callback Ptr{Void}
-type curl_sockaddr
+@ctypedef curl_sockopt_callback Ptr{Cvoid}
+mutable struct curl_sockaddr
   family::Int32
   socktype::Int32
   protocol::Int32
   addrlen::UInt32
-  addr::Void
+  addr::Cvoid
 end
-@ctypedef curl_opensocket_callback Ptr{Void}
-@ctypedef curl_closesocket_callback Ptr{Void}
+@ctypedef curl_opensocket_callback Ptr{Cvoid}
+@ctypedef curl_closesocket_callback Ptr{Cvoid}
 # enum curlioerr
 const CURLIOE_OK = 0
 const CURLIOE_UNKNOWNCMD = 1
@@ -90,12 +90,12 @@ const CURLIOCMD_RESTARTREAD = 1
 const CURLIOCMD_LAST = 2
 # end
 @ctypedef curliocmd Int32
-@ctypedef curl_ioctl_callback Ptr{Void}
-@ctypedef curl_malloc_callback Ptr{Void}
-@ctypedef curl_free_callback Ptr{Void}
-@ctypedef curl_realloc_callback Ptr{Void}
-@ctypedef curl_strdup_callback Ptr{Void}
-@ctypedef curl_calloc_callback Ptr{Void}
+@ctypedef curl_ioctl_callback Ptr{Cvoid}
+@ctypedef curl_malloc_callback Ptr{Cvoid}
+@ctypedef curl_free_callback Ptr{Cvoid}
+@ctypedef curl_realloc_callback Ptr{Cvoid}
+@ctypedef curl_strdup_callback Ptr{Cvoid}
+@ctypedef curl_calloc_callback Ptr{Cvoid}
 # enum curl_infotype
 const CURLINFO_TEXT = 0
 const CURLINFO_HEADER_IN = 1
@@ -107,7 +107,7 @@ const CURLINFO_SSL_DATA_OUT = 6
 const CURLINFO_END = 7
 # end
 @ctypedef curl_infotype Int32
-@ctypedef curl_debug_callback Ptr{Void}
+@ctypedef curl_debug_callback Ptr{Cvoid}
 # enum CURLcode
 const CURLE_OK = 0
 const CURLE_UNSUPPORTED_PROTOCOL = 1
@@ -201,8 +201,8 @@ const CURLE_CHUNK_FAILED = 88
 const CURL_LAST = 89
 # end
 @ctypedef CURLcode Int32
-@ctypedef curl_conv_callback Ptr{Void}
-@ctypedef curl_ssl_ctx_callback Ptr{Void}
+@ctypedef curl_conv_callback Ptr{Cvoid}
+@ctypedef curl_ssl_ctx_callback Ptr{Cvoid}
 # enum curl_proxytype
 const CURLPROXY_HTTP = 0
 const CURLPROXY_HTTP_1_0 = 1
@@ -212,7 +212,7 @@ const CURLPROXY_SOCKS4A = 6
 const CURLPROXY_SOCKS5_HOSTNAME = 7
 # end
 @ctypedef curl_proxytype Int32
-type curl_khkey
+mutable struct curl_khkey
   key::Ptr{UInt8}
   len::size_t
   keytype::Int32
@@ -230,7 +230,7 @@ const CURLKHMATCH_MISMATCH = 1
 const CURLKHMATCH_MISSING = 2
 const CURLKHMATCH_LAST = 3
 # end
-@ctypedef curl_sshkeycallback Ptr{Void}
+@ctypedef curl_sshkeycallback Ptr{Cvoid}
 # enum curl_usessl
 const CURLUSESSL_NONE = 0
 const CURLUSESSL_TRY = 1
@@ -520,7 +520,7 @@ const CURLFORM_STREAM = 19
 const CURLFORM_LASTENTRY = 20
 # end
 @ctypedef CURLformoption Int32
-type curl_forms
+mutable struct curl_forms
   option::CURLformoption
   value::Ptr{UInt8}
 end
@@ -536,14 +536,14 @@ const CURL_FORMADD_DISABLED = 7
 const CURL_FORMADD_LAST = 8
 # end
 @ctypedef CURLFORMcode Int32
-@ctypedef curl_formget_callback Ptr{Void}
-type curl_slist
+@ctypedef curl_formget_callback Ptr{Cvoid}
+mutable struct curl_slist
   data::Ptr{UInt8}
-  next::Ptr{Void}
+  next::Ptr{Cvoid}
 end
-type curl_certinfo
+mutable struct curl_certinfo
   num_of_certs::Int32
-  certinfo::Ptr{Ptr{Void}}
+  certinfo::Ptr{Ptr{Cvoid}}
 end
 # enum CURLINFO
 const CURLINFO_NONE = 0
@@ -619,8 +619,8 @@ const CURL_LOCK_ACCESS_SINGLE = 2
 const CURL_LOCK_ACCESS_LAST = 3
 # end
 @ctypedef curl_lock_access Int32
-@ctypedef curl_lock_function Ptr{Void}
-@ctypedef curl_unlock_function Ptr{Void}
+@ctypedef curl_lock_function Ptr{Cvoid}
+@ctypedef curl_unlock_function Ptr{Cvoid}
 @ctypedef CURLSH Union{}
 # enum CURLSHcode
 const CURLSHE_OK = 0
@@ -650,7 +650,7 @@ const CURLVERSION_FOURTH = 3
 const CURLVERSION_LAST = 4
 # end
 @ctypedef CURLversion Int32
-type curl_version_info_data
+mutable struct curl_version_info_data
   age::CURLversion
   version::Ptr{UInt8}
   version_num::UInt32
@@ -685,13 +685,13 @@ const CURLMSG_DONE = 1
 const CURLMSG_LAST = 2
 # end
 @ctypedef CURLMSG Int32
-type CURLMsg
+mutable struct CURLMsg
   msg::CURLMSG
   easy_handle::Ptr{CURL}
-  data::Void
+  data::Cvoid
 end
-@ctypedef curl_socket_callback Ptr{Void}
-@ctypedef curl_multi_timer_callback Ptr{Void}
+@ctypedef curl_socket_callback Ptr{Cvoid}
+@ctypedef curl_multi_timer_callback Ptr{Cvoid}
 # enum CURLMoption
 const CURLMOPT_SOCKETFUNCTION = 20001
 const CURLMOPT_SOCKETDATA = 10002

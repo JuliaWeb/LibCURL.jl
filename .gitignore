@@ -5,6 +5,7 @@
 /*.tar.gz
 /tmp
 /dist
+/deps/build.log
 
 /julia
 /julia-*

@@ -3,17 +3,20 @@ os:
     - linux
     - osx
 julia:
-    - 0.4
-    - 0.5
     - 0.6
+    - 0.7
+    - 1.0
     - nightly
 notifications:
     email: false
-sudo: false
-script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd())'
-    - julia -e 'Pkg.test("LibCURL", coverage=true)'
+# script:
+#     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+#     - julia -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("LibCURL"); Pkg.test("LibCURL"; coverage=true)'
 after_success:
-    - julia -e 'cd(Pkg.dir("LibCURL")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+    - |
+    julia -e '
+      VERSION >= v"0.7.0-DEV.3656" && using Pkg
+      VERSION >= v"0.7.0-DEV.5183" || cd(Pkg.dir("LibCURL"))
+      Pkg.add("Coverage"); using Coverage
+      Codecov.submit(process_folder())'
 
