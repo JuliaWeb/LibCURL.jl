@@ -12,7 +12,13 @@ include("lC_exports_h.jl")
 include("lC_common_h.jl")
 
 const libcurl = if Sys.iswindows()
-    Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin","libcurl-4")
+    dir = if VERSION >= v"0.7"
+        import WinRPM
+        joinpath(dirname(pathof(WinRPM)), "..")
+    else
+        Pkg.dir("WinRPM")
+    end
+    joinpath(dir,"deps","usr","$(Base.Sys.ARCH)-w64-mingw32","sys-root","mingw","bin","libcurl-4")
 else
     "libcurl"
 end
