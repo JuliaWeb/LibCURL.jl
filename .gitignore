@@ -6,6 +6,9 @@
 /tmp
 /dist
 /deps/build.log
+/deps/build_*.jl
+/deps/deps.jl
+/deps/usr
 
 /julia
 /julia-*
