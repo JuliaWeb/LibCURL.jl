@@ -20,6 +20,7 @@ function __init__()
 end
 
 include("lC_exports_h.jl")
+include("lC_defines_h.jl")
 include("lC_common_h.jl")
 include("lC_curl_h.jl")
 
@@ -35,8 +36,6 @@ curl_multi_setopt(handle, opt, ptrval::AbstractString) = ccall((:curl_multi_seto
 
 curl_easy_getinfo(handle, opt, ptrval::Array) = ccall((:curl_easy_getinfo, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{Cvoid}), handle, opt, pointer(ptrval))
 curl_easy_getinfo(handle, opt, ptrval::AbstractString) = ccall((:curl_easy_getinfo, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{UInt8}), handle, opt, ptrval)
-
-include("lC_defines_h.jl")
 
 include("Mime_ext.jl")
 export Mime_ext
