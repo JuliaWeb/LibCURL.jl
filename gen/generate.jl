@@ -1,5 +1,6 @@
 using Clang.cindex
 using Clang.wrap_c
+using Printf
 
 # Set these to correspond to your local filesystem's curl and clang include paths
 const CURL_PATH = "/usr/local/opt/curl/include/curl"
@@ -29,7 +30,7 @@ end
 
 function write_constants(filename::AbstractString, startswith_identifier::AbstractString, exports_file)
     open(filename, "r") do file
-        lines = split(readstring(file), "\n")
+        lines = split(read(file, String), "\n")
 
         for line in lines
             if startswith(line, startswith_identifier)
@@ -38,18 +39,6 @@ function write_constants(filename::AbstractString, startswith_identifier::Abstra
         end
     end
 end
-
-const ignore_definitions = [
-    "_TYPEOF_CURL_OFF_T", # TODO
-    "_SUFFIX_CURL_OFF_T", # TODO
-    "_SUFFIX_CURL_OFF_TU", # TODO
-    "_TYPEOF_CURL_SOCKLEN_T", # TODO
-    "PIPE_NOTHING", # Defined in lC_common_h.jl so is ok without redefinition
-    "PIPE_HTTP1", # Defined in lC_common_h.jl so is ok without redefinition
-    "PIPE_MULTIPLEX", # Defined in lC_common_h.jl so is ok without redefinition
-    "_HET_DEFAULT",  # Defined in lC_common_h.jl so is ok without redefinition
-    "INFO_MASK", # Invalid redefinition, defined in lC_common_h.jl
-]
 
 # Generate export statements
 open(joinpath(SRC_DIR, "lC_exports_h.jl"), "w+") do exports_file
@@ -62,18 +51,16 @@ open(joinpath(SRC_DIR, "lC_exports_h.jl"), "w+") do exports_file
     open(joinpath(SRC_DIR, "lC_defines_h.jl"), "w+") do defines_file
         println(defines_file, "#   Generating #define constants")
 
-        hashdefs = split(readstring(`gcc -E -dD -P $(joinpath(CURL_PATH, "curl.h"))`), "\n")
+        hashdefs = split(read(`gcc -E -dD -P $(joinpath(CURL_PATH, "curl.h"))`, String), "\n")
 
         for line in hashdefs
             m = match(r"^\s*#define\s+CURL(\w+)\s+(.+)", line)
 
-            if (m != nothing) && !in(m.captures[1], ignore_definitions)
-                warn(m.captures[1])
-                c2 = replace(m.captures[2], "(unsigned long)", "")
+            if (m != nothing)
+                c2 = replace(m.captures[2], "(unsigned long)" => "")
                 @printf defines_file "const CURL%-30s = %s\n"  m.captures[1]  c2
                 @printf exports_file "export CURL%s\n"  m.captures[1]
             end
         end
     end
 end
-
