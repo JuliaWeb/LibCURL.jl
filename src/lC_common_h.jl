@@ -514,7 +514,7 @@ const CURLFTPSSL_TRY = CURLUSESSL_TRY
 const CURLFTPSSL_CONTROL = CURLUSESSL_CONTROL
 const CURLFTPSSL_ALL = CURLUSESSL_ALL
 const CURLFTPSSL_LAST = CURLUSESSL_LAST
-const curl_usessl = Void
+const curl_usessl = Cvoid
 const curl_ftpssl = curl_usessl
 const CURLHEADER_UNIFIED = 0
 const CURLHEADER_SEPARATE = 1 << 0
@@ -762,13 +762,13 @@ const CURL_PUSH_DENY = 1
 # Skipping MacroDefinition: curl_share_setopt ( share , opt , param ) curl_share_setopt ( share , opt , param )
 # Skipping MacroDefinition: curl_multi_setopt ( handle , opt , param ) curl_multi_setopt ( handle , opt , param )
 
-const CURL = Void
-const CURLSH = Void
+const CURL = Cvoid
+const CURLSH = Cvoid
 const curl_socket_t = Cint
-const curl_sslbackend = Void
+const curl_sslbackend = Cvoid
 
-mutable struct curl_httppost
-    next::Ptr{Void}
+$(Expr(:type, true, :curl_httppost, quote
+    next::Ptr{Cvoid}
     name::Cstring
     namelength::Clong
     contents::Cstring
@@ -776,18 +776,18 @@ mutable struct curl_httppost
     buffer::Cstring
     bufferlength::Clong
     contenttype::Cstring
-    contentheader::Ptr{Void}
-    more::Ptr{Void}
+    contentheader::Ptr{Cvoid}
+    more::Ptr{Cvoid}
     flags::Clong
     showfilename::Cstring
-    userp::Ptr{Void}
+    userp::Ptr{Cvoid}
     contentlen::curl_off_t
-end
+end))
 
-const curl_progress_callback = Ptr{Void}
-const curl_xferinfo_callback = Ptr{Void}
-const curl_write_callback = Ptr{Void}
-const curl_resolver_start_callback = Ptr{Void}
+const curl_progress_callback = Ptr{Cvoid}
+const curl_xferinfo_callback = Ptr{Cvoid}
+const curl_write_callback = Ptr{Cvoid}
+const curl_resolver_start_callback = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_2
 const ANONYMOUS_2 = UInt32
@@ -802,9 +802,9 @@ const CURLFILETYPE_DOOR = (UInt32)(7)
 const CURLFILETYPE_UNKNOWN = (UInt32)(8)
 # end enum ANONYMOUS_2
 
-const curlfiletype = Void
+const curlfiletype = Cvoid
 
-mutable struct curl_fileinfo
+$(Expr(:type, true, :curl_fileinfo, quote
     filename::Cstring
     filetype::curlfiletype
     time::time_t
@@ -813,18 +813,18 @@ mutable struct curl_fileinfo
     gid::Cint
     size::curl_off_t
     hardlinks::Clong
-    strings::Void
+    strings::Cvoid
     flags::UInt32
     b_data::Cstring
     b_size::Csize_t
     b_used::Csize_t
-end
+end))
 
-const curl_chunk_bgn_callback = Ptr{Void}
-const curl_chunk_end_callback = Ptr{Void}
-const curl_fnmatch_callback = Ptr{Void}
-const curl_seek_callback = Ptr{Void}
-const curl_read_callback = Ptr{Void}
+const curl_chunk_bgn_callback = Ptr{Cvoid}
+const curl_chunk_end_callback = Ptr{Cvoid}
+const curl_fnmatch_callback = Ptr{Cvoid}
+const curl_seek_callback = Ptr{Cvoid}
+const curl_read_callback = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_3
 const ANONYMOUS_3 = UInt32
@@ -833,19 +833,19 @@ const CURLSOCKTYPE_ACCEPT = (UInt32)(1)
 const CURLSOCKTYPE_LAST = (UInt32)(2)
 # end enum ANONYMOUS_3
 
-const curlsocktype = Void
-const curl_sockopt_callback = Ptr{Void}
+const curlsocktype = Cvoid
+const curl_sockopt_callback = Ptr{Cvoid}
 
-mutable struct curl_sockaddr
+$(Expr(:type, true, :curl_sockaddr, quote
     family::Cint
     socktype::Cint
     protocol::Cint
     addrlen::UInt32
-    addr::Void
-end
+    addr::Cvoid
+end))
 
-const curl_opensocket_callback = Ptr{Void}
-const curl_closesocket_callback = Ptr{Void}
+const curl_opensocket_callback = Ptr{Cvoid}
+const curl_closesocket_callback = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_4
 const ANONYMOUS_4 = UInt32
@@ -855,7 +855,7 @@ const CURLIOE_FAILRESTART = (UInt32)(2)
 const CURLIOE_LAST = (UInt32)(3)
 # end enum ANONYMOUS_4
 
-const curlioerr = Void
+const curlioerr = Cvoid
 
 # begin enum ANONYMOUS_5
 const ANONYMOUS_5 = UInt32
@@ -864,13 +864,13 @@ const CURLIOCMD_RESTARTREAD = (UInt32)(1)
 const CURLIOCMD_LAST = (UInt32)(2)
 # end enum ANONYMOUS_5
 
-const curliocmd = Void
-const curl_ioctl_callback = Ptr{Void}
-const curl_malloc_callback = Ptr{Void}
-const curl_free_callback = Ptr{Void}
-const curl_realloc_callback = Ptr{Void}
-const curl_strdup_callback = Ptr{Void}
-const curl_calloc_callback = Ptr{Void}
+const curliocmd = Cvoid
+const curl_ioctl_callback = Ptr{Cvoid}
+const curl_malloc_callback = Ptr{Cvoid}
+const curl_free_callback = Ptr{Cvoid}
+const curl_realloc_callback = Ptr{Cvoid}
+const curl_strdup_callback = Ptr{Cvoid}
+const curl_calloc_callback = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_6
 const ANONYMOUS_6 = UInt32
@@ -884,11 +884,11 @@ const CURLINFO_SSL_DATA_OUT = (UInt32)(6)
 const CURLINFO_END = (UInt32)(7)
 # end enum ANONYMOUS_6
 
-const curl_infotype = Void
-const curl_debug_callback = Ptr{Void}
-const CURLcode = Void
-const curl_conv_callback = Ptr{Void}
-const curl_ssl_ctx_callback = Ptr{Void}
+const curl_infotype = Cvoid
+const curl_debug_callback = Ptr{Cvoid}
+const CURLcode = Cvoid
+const curl_conv_callback = Ptr{Cvoid}
+const curl_ssl_ctx_callback = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_8
 const ANONYMOUS_8 = UInt32
@@ -901,7 +901,7 @@ const CURLPROXY_SOCKS4A = (UInt32)(6)
 const CURLPROXY_SOCKS5_HOSTNAME = (UInt32)(7)
 # end enum ANONYMOUS_8
 
-const curl_proxytype = Void
+const curl_proxytype = Cvoid
 
 # begin enum curl_khtype
 const curl_khtype = UInt32
@@ -913,11 +913,11 @@ const CURLKHTYPE_ECDSA = (UInt32)(4)
 const CURLKHTYPE_ED25519 = (UInt32)(5)
 # end enum curl_khtype
 
-mutable struct curl_khkey
+$(Expr(:type, true, :curl_khkey, quote
     key::Cstring
     len::Csize_t
-    keytype::Void
-end
+    keytype::Cvoid
+end))
 
 # begin enum curl_khstat
 const curl_khstat = UInt32
@@ -936,7 +936,7 @@ const CURLKHMATCH_MISSING = (UInt32)(2)
 const CURLKHMATCH_LAST = (UInt32)(3)
 # end enum curl_khmatch
 
-const curl_sshkeycallback = Ptr{Void}
+const curl_sshkeycallback = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_10
 const ANONYMOUS_10 = UInt32
@@ -946,7 +946,7 @@ const CURLFTPSSL_CCC_ACTIVE = (UInt32)(2)
 const CURLFTPSSL_CCC_LAST = (UInt32)(3)
 # end enum ANONYMOUS_10
 
-const curl_ftpccc = Void
+const curl_ftpccc = Cvoid
 
 # begin enum ANONYMOUS_11
 const ANONYMOUS_11 = UInt32
@@ -956,7 +956,7 @@ const CURLFTPAUTH_TLS = (UInt32)(2)
 const CURLFTPAUTH_LAST = (UInt32)(3)
 # end enum ANONYMOUS_11
 
-const curl_ftpauth = Void
+const curl_ftpauth = Cvoid
 
 # begin enum ANONYMOUS_12
 const ANONYMOUS_12 = UInt32
@@ -966,7 +966,7 @@ const CURLFTP_CREATE_DIR_RETRY = (UInt32)(2)
 const CURLFTP_CREATE_DIR_LAST = (UInt32)(3)
 # end enum ANONYMOUS_12
 
-const curl_ftpcreatedir = Void
+const curl_ftpcreatedir = Cvoid
 
 # begin enum ANONYMOUS_13
 const ANONYMOUS_13 = UInt32
@@ -977,8 +977,8 @@ const CURLFTPMETHOD_SINGLECWD = (UInt32)(3)
 const CURLFTPMETHOD_LAST = (UInt32)(4)
 # end enum ANONYMOUS_13
 
-const curl_ftpmethod = Void
-const CURLoption = Void
+const curl_ftpmethod = Cvoid
+const CURLoption = Cvoid
 
 # begin enum ANONYMOUS_16
 const ANONYMOUS_16 = UInt32
@@ -1045,17 +1045,17 @@ const CURL_TIMECOND_LASTMOD = (UInt32)(3)
 const CURL_TIMECOND_LAST = (UInt32)(4)
 # end enum ANONYMOUS_19
 
-const curl_TimeCond = Void
+const curl_TimeCond = Cvoid
 
-mutable struct curl_mime_s
-end
+$(Expr(:type, true, :curl_mime_s, quote
+end))
 
-const curl_mime = Void
+const curl_mime = Cvoid
 
-mutable struct curl_mimepart_s
-end
+$(Expr(:type, true, :curl_mimepart_s, quote
+end))
 
-const curl_mimepart = Void
+const curl_mimepart = Cvoid
 
 # begin enum ANONYMOUS_20
 const ANONYMOUS_20 = UInt32
@@ -1083,12 +1083,12 @@ const CURLFORM_CONTENTLEN = (UInt32)(20)
 const CURLFORM_LASTENTRY = (UInt32)(21)
 # end enum ANONYMOUS_20
 
-const CURLformoption = Void
+const CURLformoption = Cvoid
 
-mutable struct curl_forms
+$(Expr(:type, true, :curl_forms, quote
     option::CURLformoption
     value::Cstring
-end
+end))
 
 # begin enum ANONYMOUS_21
 const ANONYMOUS_21 = UInt32
@@ -1103,15 +1103,15 @@ const CURL_FORMADD_DISABLED = (UInt32)(7)
 const CURL_FORMADD_LAST = (UInt32)(8)
 # end enum ANONYMOUS_21
 
-const CURLFORMcode = Void
-const curl_formget_callback = Ptr{Void}
+const CURLFORMcode = Cvoid
+const curl_formget_callback = Ptr{Cvoid}
 
-mutable struct curl_slist
+$(Expr(:type, true, :curl_slist, quote
     data::Cstring
-    next::Ptr{Void}
-end
+    next::Ptr{Cvoid}
+end))
 
-const curl_ssl_backend = Void
+const curl_ssl_backend = Cvoid
 
 # begin enum ANONYMOUS_22
 const ANONYMOUS_22 = UInt32
@@ -1121,19 +1121,19 @@ const CURLSSLSET_TOO_LATE = (UInt32)(2)
 const CURLSSLSET_NO_BACKENDS = (UInt32)(3)
 # end enum ANONYMOUS_22
 
-const CURLsslset = Void
+const CURLsslset = Cvoid
 
-mutable struct curl_certinfo
+$(Expr(:type, true, :curl_certinfo, quote
     num_of_certs::Cint
-    certinfo::Ptr{Ptr{Void}}
-end
+    certinfo::Ptr{Ptr{Cvoid}}
+end))
 
-mutable struct curl_tlssessioninfo
+$(Expr(:type, true, :curl_tlssessioninfo, quote
     backend::curl_sslbackend
-    internals::Ptr{Void}
-end
+    internals::Ptr{Cvoid}
+end))
 
-const CURLINFO = Void
+const CURLINFO = Cvoid
 
 # begin enum ANONYMOUS_24
 const ANONYMOUS_24 = UInt32
@@ -1146,7 +1146,7 @@ const CURLCLOSEPOLICY_CALLBACK = (UInt32)(5)
 const CURLCLOSEPOLICY_LAST = (UInt32)(6)
 # end enum ANONYMOUS_24
 
-const curl_closepolicy = Void
+const curl_closepolicy = Cvoid
 
 # begin enum ANONYMOUS_25
 const ANONYMOUS_25 = UInt32
@@ -1160,7 +1160,7 @@ const CURL_LOCK_DATA_PSL = (UInt32)(6)
 const CURL_LOCK_DATA_LAST = (UInt32)(7)
 # end enum ANONYMOUS_25
 
-const curl_lock_data = Void
+const curl_lock_data = Cvoid
 
 # begin enum ANONYMOUS_26
 const ANONYMOUS_26 = UInt32
@@ -1170,9 +1170,9 @@ const CURL_LOCK_ACCESS_SINGLE = (UInt32)(2)
 const CURL_LOCK_ACCESS_LAST = (UInt32)(3)
 # end enum ANONYMOUS_26
 
-const curl_lock_access = Void
-const curl_lock_function = Ptr{Void}
-const curl_unlock_function = Ptr{Void}
+const curl_lock_access = Cvoid
+const curl_lock_function = Ptr{Cvoid}
+const curl_unlock_function = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_27
 const ANONYMOUS_27 = UInt32
@@ -1185,7 +1185,7 @@ const CURLSHE_NOT_BUILT_IN = (UInt32)(5)
 const CURLSHE_LAST = (UInt32)(6)
 # end enum ANONYMOUS_27
 
-const CURLSHcode = Void
+const CURLSHcode = Cvoid
 
 # begin enum ANONYMOUS_28
 const ANONYMOUS_28 = UInt32
@@ -1198,11 +1198,11 @@ const CURLSHOPT_USERDATA = (UInt32)(5)
 const CURLSHOPT_LAST = (UInt32)(6)
 # end enum ANONYMOUS_28
 
-const CURLSHoption = Void
-const CURLversion = Void
-const curl_version_info_data = Void
-const CURLM = Void
-const CURLMcode = Void
+const CURLSHoption = Cvoid
+const CURLversion = Cvoid
+const curl_version_info_data = Cvoid
+const CURLM = Cvoid
+const CURLMcode = Cvoid
 
 # begin enum ANONYMOUS_31
 const ANONYMOUS_31 = UInt32
@@ -1211,22 +1211,22 @@ const CURLMSG_DONE = (UInt32)(1)
 const CURLMSG_LAST = (UInt32)(2)
 # end enum ANONYMOUS_31
 
-const CURLMSG = Void
+const CURLMSG = Cvoid
 
-mutable struct CURLMsg
+$(Expr(:type, true, :CURLMsg, quote
     msg::CURLMSG
     easy_handle::Ptr{CURL}
-    data::Void
-end
+    data::Cvoid
+end))
 
-mutable struct curl_waitfd
+$(Expr(:type, true, :curl_waitfd, quote
     fd::curl_socket_t
     events::Int16
     revents::Int16
-end
+end))
 
-const curl_socket_callback = Ptr{Void}
-const curl_multi_timer_callback = Ptr{Void}
+const curl_socket_callback = Ptr{Cvoid}
+const curl_multi_timer_callback = Ptr{Cvoid}
 
 # begin enum ANONYMOUS_32
 const ANONYMOUS_32 = UInt32
@@ -1248,9 +1248,9 @@ const CURLMOPT_PUSHDATA = (UInt32)(10015)
 const CURLMOPT_LASTENTRY = (UInt32)(10016)
 # end enum ANONYMOUS_32
 
-const CURLMoption = Void
+const CURLMoption = Cvoid
 
-mutable struct curl_pushheaders
-end
+$(Expr(:type, true, :curl_pushheaders, quote
+end))
 
-const curl_push_callback = Ptr{Void}
+const curl_push_callback = Ptr{Cvoid}
