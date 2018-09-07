@@ -39,12 +39,16 @@ function write_constants(filename::AbstractString, startswith_identifier::Abstra
     end
 end
 
-# TODO: Do we really want to ignore these?
 const ignore_definitions = [
-    "_TYPEOF_CURL_OFF_T",
-    "_SUFFIX_CURL_OFF_T",
-    "_SUFFIX_CURL_OFF_TU",
-    "_TYPEOF_CURL_SOCKLEN_T",
+    "_TYPEOF_CURL_OFF_T", # TODO
+    "_SUFFIX_CURL_OFF_T", # TODO
+    "_SUFFIX_CURL_OFF_TU", # TODO
+    "_TYPEOF_CURL_SOCKLEN_T", # TODO
+    "PIPE_NOTHING", # Defined in lC_common_h.jl so is ok without redefinition
+    "PIPE_HTTP1", # Defined in lC_common_h.jl so is ok without redefinition
+    "PIPE_MULTIPLEX", # Defined in lC_common_h.jl so is ok without redefinition
+    "_HET_DEFAULT",  # Defined in lC_common_h.jl so is ok without redefinition
+    "INFO_MASK", # Invalid redefinition, defined in lC_common_h.jl
 ]
 
 # Generate export statements

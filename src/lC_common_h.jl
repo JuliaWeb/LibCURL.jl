@@ -470,8 +470,8 @@ const CURLOPT_CLOSEPOLICY = CURLOPT_OBSOLETE72
 # Skipping MacroDefinition: CURLAUTH_DIGEST ( ( ( unsigned long ) 1 ) << 1 )
 # Skipping MacroDefinition: CURLAUTH_NEGOTIATE ( ( ( unsigned long ) 1 ) << 2 )
 
-const CURLAUTH_GSSNEGOTIATE = CURLAUTH_NEGOTIATE
-const CURLAUTH_GSSAPI = CURLAUTH_NEGOTIATE
+# const CURLAUTH_GSSNEGOTIATE = CURLAUTH_NEGOTIATE
+# const CURLAUTH_GSSAPI = CURLAUTH_NEGOTIATE
 
 # Skipping MacroDefinition: CURLAUTH_NTLM ( ( ( unsigned long ) 1 ) << 3 )
 # Skipping MacroDefinition: CURLAUTH_DIGEST_IE ( ( ( unsigned long ) 1 ) << 4 )
@@ -479,7 +479,7 @@ const CURLAUTH_GSSAPI = CURLAUTH_NEGOTIATE
 # Skipping MacroDefinition: CURLAUTH_BEARER ( ( ( unsigned long ) 1 ) << 6 )
 # Skipping MacroDefinition: CURLAUTH_ONLY ( ( ( unsigned long ) 1 ) << 31 )
 
-const CURLAUTH_ANY = ~CURLAUTH_DIGEST_IE
+# const CURLAUTH_ANY = ~CURLAUTH_DIGEST_IE
 
 # Skipping MacroDefinition: CURLAUTH_ANYSAFE ( ~ ( CURLAUTH_BASIC | CURLAUTH_DIGEST_IE ) )
 
