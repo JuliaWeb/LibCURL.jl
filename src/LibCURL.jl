@@ -4,9 +4,8 @@ module LibCURL
 
 import Compat: Sys, Cvoid
 
-# TODO; go through these and see what's needed
 const time_t = Int
-const size_t = Csize_t # TODO: make work with CURL_ZERO_TERMINATED
+const size_t = Csize_t
 const curl_off_t = Int64
 const fd_set = Union{}
 
