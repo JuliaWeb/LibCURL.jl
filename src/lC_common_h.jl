@@ -2,10 +2,14 @@
 
 using Compat
 
+const CURL = Cvoid
+const CURLSH = Cvoid
+
+const curl_socket_t = Cint
 const CURL_SOCKET_BAD = -1
 
-# begin enum ANONYMOUS_1
-const ANONYMOUS_1 = UInt32
+# begin enum curl_sslbackend
+const curl_sslbackend = UInt32
 const CURLSSLBACKEND_NONE = (UInt32)(0)
 const CURLSSLBACKEND_OPENSSL = (UInt32)(1)
 const CURLSSLBACKEND_GNUTLS = (UInt32)(2)
@@ -18,11 +22,29 @@ const CURLSSLBACKEND_SCHANNEL = (UInt32)(8)
 const CURLSSLBACKEND_DARWINSSL = (UInt32)(9)
 const CURLSSLBACKEND_AXTLS = (UInt32)(10)
 const CURLSSLBACKEND_MBEDTLS = (UInt32)(11)
-# end enum ANONYMOUS_1
+# end enum curl_sslbackend
 
 const CURLSSLBACKEND_LIBRESSL = CURLSSLBACKEND_OPENSSL
 const CURLSSLBACKEND_BORINGSSL = CURLSSLBACKEND_OPENSSL
 const CURLSSLBACKEND_CYASSL = CURLSSLBACKEND_WOLFSSL
+
+mutable struct curl_httppost
+    next::Ptr{Cvoid}
+    name::Ptr{UInt8}
+    namelength::Clong
+    contents::Ptr{UInt8}
+    contentslength::Clong
+    buffer::Ptr{UInt8}
+    bufferlength::Clong
+    contenttype::Ptr{UInt8}
+    contentheader::Ptr{Cvoid}
+    more::Ptr{Cvoid}
+    flags::Clong
+    showfilename::Ptr{UInt8}
+    userp::Ptr{Cvoid}
+    contentlen::curl_off_t
+end
+
 const CURL_HTTPPOST_FILENAME = 1 << 0
 const CURL_HTTPPOST_READFILE = 1 << 1
 const CURL_HTTPPOST_PTRNAME = 1 << 2
@@ -31,10 +53,18 @@ const CURL_HTTPPOST_BUFFER = 1 << 4
 const CURL_HTTPPOST_PTRBUFFER = 1 << 5
 const CURL_HTTPPOST_CALLBACK = 1 << 6
 const CURL_HTTPPOST_LARGE = 1 << 7
+
+const curl_progress_callback = Ptr{Cvoid}
+const curl_xferinfo_callback = Ptr{Cvoid}
+
 const CURL_MAX_READ_SIZE = 524288
 const CURL_MAX_WRITE_SIZE = 16384
 const CURL_MAX_HTTP_HEADER = 100 * 1024
 const CURL_WRITEFUNC_PAUSE = 0x10000001
+
+const curl_write_callback = Ptr{Cvoid}
+const curl_resolver_start_callback = Ptr{Cvoid}
+
 const CURLFINFOFLAG_KNOWN_FILENAME = 1 << 0
 const CURLFINFOFLAG_KNOWN_FILETYPE = 1 << 1
 const CURLFINFOFLAG_KNOWN_TIME = 1 << 2
@@ -60,8 +90,99 @@ const CURL_SOCKOPT_OK = 0
 const CURL_SOCKOPT_ERROR = 1
 const CURL_SOCKOPT_ALREADY_CONNECTED = 2
 
-# begin enum ANONYMOUS_7
-const ANONYMOUS_7 = UInt32
+# begin enum curlfiletype
+const curlfiletype = UInt32
+const CURLFILETYPE_FILE = (UInt32)(0)
+const CURLFILETYPE_DIRECTORY = (UInt32)(1)
+const CURLFILETYPE_SYMLINK = (UInt32)(2)
+const CURLFILETYPE_DEVICE_BLOCK = (UInt32)(3)
+const CURLFILETYPE_DEVICE_CHAR = (UInt32)(4)
+const CURLFILETYPE_NAMEDPIPE = (UInt32)(5)
+const CURLFILETYPE_SOCKET = (UInt32)(6)
+const CURLFILETYPE_DOOR = (UInt32)(7)
+const CURLFILETYPE_UNKNOWN = (UInt32)(8)
+# end enum curlfiletype
+
+mutable struct curl_fileinfo
+    filename::Ptr{UInt8}
+    filetype::curlfiletype
+    time::time_t
+    perm::UInt32
+    uid::Cint
+    gid::Cint
+    size::curl_off_t
+    hardlinks::Clong
+    strings::Cvoid
+    flags::UInt32
+    b_data::Ptr{UInt8}
+    b_size::Csize_t
+    b_used::Csize_t
+end
+
+const curl_chunk_bgn_callback = Ptr{Cvoid}
+const curl_chunk_end_callback = Ptr{Cvoid}
+const curl_fnmatch_callback = Ptr{Cvoid}
+const curl_seek_callback = Ptr{Cvoid}
+const curl_read_callback = Ptr{Cvoid}
+
+# begin enum curlsocktype
+const curlsocktype = UInt32
+const CURLSOCKTYPE_IPCXN = (UInt32)(0)
+const CURLSOCKTYPE_ACCEPT = (UInt32)(1)
+const CURLSOCKTYPE_LAST = (UInt32)(2)
+# end enum curlsocktype
+
+const curl_sockopt_callback = Ptr{Cvoid}
+
+mutable struct curl_sockaddr
+    family::Cint
+    socktype::Cint
+    protocol::Cint
+    addrlen::UInt32
+    addr::Cvoid
+end
+
+const curl_opensocket_callback = Ptr{Cvoid}
+const curl_closesocket_callback = Ptr{Cvoid}
+
+# begin enum curlioerr
+const curlioerr = UInt32
+const CURLIOE_OK = (UInt32)(0)
+const CURLIOE_UNKNOWNCMD = (UInt32)(1)
+const CURLIOE_FAILRESTART = (UInt32)(2)
+const CURLIOE_LAST = (UInt32)(3)
+# end enum curlioerr
+
+# begin enum curliocmd
+const curliocmd = UInt32
+const CURLIOCMD_NOP = (UInt32)(0)
+const CURLIOCMD_RESTARTREAD = (UInt32)(1)
+const CURLIOCMD_LAST = (UInt32)(2)
+# end enum curliocmd
+
+const curl_ioctl_callback = Ptr{Cvoid}
+const curl_malloc_callback = Ptr{Cvoid}
+const curl_free_callback = Ptr{Cvoid}
+const curl_realloc_callback = Ptr{Cvoid}
+const curl_strdup_callback = Ptr{Cvoid}
+const curl_calloc_callback = Ptr{Cvoid}
+
+# begin enum curl_infotype
+const curl_infotype = UInt32
+const CURLINFO_TEXT = (UInt32)(0)
+const CURLINFO_HEADER_IN = (UInt32)(1)
+const CURLINFO_HEADER_OUT = (UInt32)(2)
+const CURLINFO_DATA_IN = (UInt32)(3)
+const CURLINFO_DATA_OUT = (UInt32)(4)
+const CURLINFO_SSL_DATA_IN = (UInt32)(5)
+const CURLINFO_SSL_DATA_OUT = (UInt32)(6)
+const CURLINFO_END = (UInt32)(7)
+# end enum curl_infotype
+
+const curl_debug_callback = Ptr{Cvoid}
+
+# begin enum CURLcode
+const CURLcode = UInt32
 const CURLE_OK = (UInt32)(0)
 const CURLE_UNSUPPORTED_PROTOCOL = (UInt32)(1)
 const CURLE_FAILED_INIT = (UInt32)(2)
@@ -157,14 +278,224 @@ const CURLE_SSL_INVALIDCERTSTATUS = (UInt32)(91)
 const CURLE_HTTP2_STREAM = (UInt32)(92)
 const CURLE_RECURSIVE_API_CALL = (UInt32)(93)
 const CURL_LAST = (UInt32)(94)
-# end enum ANONYMOUS_7
+# end enum CURLcode
 
 const CURLE_OBSOLETE16 = CURLE_HTTP2
 const CURLE_OBSOLETE10 = CURLE_FTP_ACCEPT_FAILED
 const CURLE_OBSOLETE12 = CURLE_FTP_ACCEPT_TIMEOUT
 
-# begin enum ANONYMOUS_14
-const ANONYMOUS_14 = UInt32
+const CURLOPT_ENCODING = CURLOPT_ACCEPT_ENCODING
+const CURLE_FTP_WEIRD_SERVER_REPLY = CURLE_WEIRD_SERVER_REPLY
+const CURLE_UNKNOWN_TELNET_OPTION = CURLE_UNKNOWN_OPTION
+const CURLE_SSL_PEER_CERTIFICATE = CURLE_PEER_FAILED_VERIFICATION
+const CURLE_OBSOLETE = CURLE_OBSOLETE50
+const CURLE_BAD_PASSWORD_ENTERED = CURLE_OBSOLETE46
+const CURLE_BAD_CALLING_ORDER = CURLE_OBSOLETE44
+const CURLE_FTP_USER_PASSWORD_INCORRECT = CURLE_OBSOLETE10
+const CURLE_FTP_CANT_RECONNECT = CURLE_OBSOLETE16
+const CURLE_FTP_COULDNT_GET_SIZE = CURLE_OBSOLETE32
+const CURLE_FTP_COULDNT_SET_ASCII = CURLE_OBSOLETE29
+const CURLE_FTP_WEIRD_USER_REPLY = CURLE_OBSOLETE12
+const CURLE_FTP_WRITE_ERROR = CURLE_OBSOLETE20
+const CURLE_LIBRARY_NOT_FOUND = CURLE_OBSOLETE40
+const CURLE_MALFORMAT_USER = CURLE_OBSOLETE24
+const CURLE_SHARE_IN_USE = CURLE_OBSOLETE57
+const CURLE_URL_MALFORMAT_USER = CURLE_NOT_BUILT_IN
+const CURLE_FTP_ACCESS_DENIED = CURLE_REMOTE_ACCESS_DENIED
+const CURLE_FTP_COULDNT_SET_BINARY = CURLE_FTP_COULDNT_SET_TYPE
+const CURLE_FTP_QUOTE_ERROR = CURLE_QUOTE_ERROR
+const CURLE_TFTP_DISKFULL = CURLE_REMOTE_DISK_FULL
+const CURLE_TFTP_EXISTS = CURLE_REMOTE_FILE_EXISTS
+const CURLE_HTTP_RANGE_ERROR = CURLE_RANGE_ERROR
+const CURLE_FTP_SSL_FAILED = CURLE_USE_SSL_FAILED
+const CURLE_OPERATION_TIMEOUTED = CURLE_OPERATION_TIMEDOUT
+const CURLE_HTTP_NOT_FOUND = CURLE_HTTP_RETURNED_ERROR
+const CURLE_HTTP_PORT_FAILED = CURLE_INTERFACE_FAILED
+const CURLE_FTP_COULDNT_STOR_FILE = CURLE_UPLOAD_FAILED
+const CURLE_FTP_PARTIAL_FILE = CURLE_PARTIAL_FILE
+const CURLE_FTP_BAD_DOWNLOAD_RESUME = CURLE_BAD_DOWNLOAD_RESUME
+const CURLE_ALREADY_COMPLETE = 99999
+const CURLOPT_FILE = CURLOPT_WRITEDATA
+const CURLOPT_INFILE = CURLOPT_READDATA
+const CURLOPT_WRITEHEADER = CURLOPT_HEADERDATA
+const CURLOPT_WRITEINFO = CURLOPT_OBSOLETE40
+const CURLOPT_CLOSEPOLICY = CURLOPT_OBSOLETE72
+
+const curl_conv_callback = Ptr{Cvoid}
+const curl_ssl_ctx_callback = Ptr{Cvoid}
+
+# begin enum curl_proxytype
+const curl_proxytype = UInt32
+const CURLPROXY_HTTP = (UInt32)(0)
+const CURLPROXY_HTTP_1_0 = (UInt32)(1)
+const CURLPROXY_HTTPS = (UInt32)(2)
+const CURLPROXY_SOCKS4 = (UInt32)(4)
+const CURLPROXY_SOCKS5 = (UInt32)(5)
+const CURLPROXY_SOCKS4A = (UInt32)(6)
+const CURLPROXY_SOCKS5_HOSTNAME = (UInt32)(7)
+# end enum curl_proxytype
+
+# Skipping MacroDefinition: CURLAUTH_NONE ( ( unsigned long ) 0 )
+# Skipping MacroDefinition: CURLAUTH_BASIC ( ( ( unsigned long ) 1 ) << 0 )
+# Skipping MacroDefinition: CURLAUTH_DIGEST ( ( ( unsigned long ) 1 ) << 1 )
+# Skipping MacroDefinition: CURLAUTH_NEGOTIATE ( ( ( unsigned long ) 1 ) << 2 )
+
+# const CURLAUTH_GSSNEGOTIATE = CURLAUTH_NEGOTIATE
+# const CURLAUTH_GSSAPI = CURLAUTH_NEGOTIATE
+
+# Skipping MacroDefinition: CURLAUTH_NTLM ( ( ( unsigned long ) 1 ) << 3 )
+# Skipping MacroDefinition: CURLAUTH_DIGEST_IE ( ( ( unsigned long ) 1 ) << 4 )
+# Skipping MacroDefinition: CURLAUTH_NTLM_WB ( ( ( unsigned long ) 1 ) << 5 )
+# Skipping MacroDefinition: CURLAUTH_BEARER ( ( ( unsigned long ) 1 ) << 6 )
+# Skipping MacroDefinition: CURLAUTH_ONLY ( ( ( unsigned long ) 1 ) << 31 )
+
+# const CURLAUTH_ANY = ~CURLAUTH_DIGEST_IE
+
+# Skipping MacroDefinition: CURLAUTH_ANYSAFE ( ~ ( CURLAUTH_BASIC | CURLAUTH_DIGEST_IE ) )
+
+const CURLSSH_AUTH_ANY = ~0
+const CURLSSH_AUTH_NONE = 0
+const CURLSSH_AUTH_PUBLICKEY = 1 << 0
+const CURLSSH_AUTH_PASSWORD = 1 << 1
+const CURLSSH_AUTH_HOST = 1 << 2
+const CURLSSH_AUTH_KEYBOARD = 1 << 3
+const CURLSSH_AUTH_AGENT = 1 << 4
+const CURLSSH_AUTH_GSSAPI = 1 << 5
+const CURLSSH_AUTH_DEFAULT = CURLSSH_AUTH_ANY
+const CURLGSSAPI_DELEGATION_NONE = 0
+const CURLGSSAPI_DELEGATION_POLICY_FLAG = 1 << 0
+const CURLGSSAPI_DELEGATION_FLAG = 1 << 1
+const CURL_ERROR_SIZE = 256
+
+# begin enum curl_khtype
+const curl_khtype = UInt32
+const CURLKHTYPE_UNKNOWN = (UInt32)(0)
+const CURLKHTYPE_RSA1 = (UInt32)(1)
+const CURLKHTYPE_RSA = (UInt32)(2)
+const CURLKHTYPE_DSS = (UInt32)(3)
+const CURLKHTYPE_ECDSA = (UInt32)(4)
+const CURLKHTYPE_ED25519 = (UInt32)(5)
+# end enum curl_khtype
+
+mutable struct curl_khkey
+    key::Ptr{UInt8}
+    len::Csize_t
+    keytype::Cvoid
+end
+
+# begin enum curl_khstat
+const curl_khstat = UInt32
+const CURLKHSTAT_FINE_ADD_TO_FILE = (UInt32)(0)
+const CURLKHSTAT_FINE = (UInt32)(1)
+const CURLKHSTAT_REJECT = (UInt32)(2)
+const CURLKHSTAT_DEFER = (UInt32)(3)
+const CURLKHSTAT_LAST = (UInt32)(4)
+# end enum curl_khstat
+
+# begin enum curl_khmatch
+const curl_khmatch = UInt32
+const CURLKHMATCH_OK = (UInt32)(0)
+const CURLKHMATCH_MISMATCH = (UInt32)(1)
+const CURLKHMATCH_MISSING = (UInt32)(2)
+const CURLKHMATCH_LAST = (UInt32)(3)
+# end enum curl_khmatch
+
+const curl_sshkeycallback = Ptr{Cvoid}
+
+# begin enum curl_usessl
+const curl_usessl = UInt32
+const CURLUSESSL_NONE = (UInt32)(0)
+const CURLUSESSL_TRY = (UInt32)(1)
+const CURLUSESSL_CONTROL = (UInt32)(2)
+const CURLUSESSL_ALL = (UInt32)(3)
+const CURLUSESSL_LAST = (UInt32)(4)
+# end enum curl_usessl
+
+const CURLSSLOPT_ALLOW_BEAST = 1 << 0
+const CURLSSLOPT_NO_REVOKE = 1 << 1
+const CURL_HET_DEFAULT = Clong(200)
+
+const curl_ftpssl = curl_usessl
+const CURLFTPSSL_NONE = CURLUSESSL_NONE
+const CURLFTPSSL_TRY = CURLUSESSL_TRY
+const CURLFTPSSL_CONTROL = CURLUSESSL_CONTROL
+const CURLFTPSSL_ALL = CURLUSESSL_ALL
+const CURLFTPSSL_LAST = CURLUSESSL_LAST
+
+# begin enum curl_ftpccc
+const curl_ftpccc = UInt32
+const CURLFTPSSL_CCC_NONE = (UInt32)(0)
+const CURLFTPSSL_CCC_PASSIVE = (UInt32)(1)
+const CURLFTPSSL_CCC_ACTIVE = (UInt32)(2)
+const CURLFTPSSL_CCC_LAST = (UInt32)(3)
+# end enum curl_ftpccc
+
+# begin enum curl_ftpauth
+const curl_ftpauth = UInt32
+const CURLFTPAUTH_DEFAULT = (UInt32)(0)
+const CURLFTPAUTH_SSL = (UInt32)(1)
+const CURLFTPAUTH_TLS = (UInt32)(2)
+const CURLFTPAUTH_LAST = (UInt32)(3)
+# end enum curl_ftpauth
+
+# begin enum curl_ftpcreatedir
+const curl_ftpcreatedir = UInt32
+const CURLFTP_CREATE_DIR_NONE = (UInt32)(0)
+const CURLFTP_CREATE_DIR = (UInt32)(1)
+const CURLFTP_CREATE_DIR_RETRY = (UInt32)(2)
+const CURLFTP_CREATE_DIR_LAST = (UInt32)(3)
+# end enum curl_ftpcreatedir
+
+# begin enum curl_ftpmethod
+const curl_ftpmethod = UInt32
+const CURLFTPMETHOD_DEFAULT = (UInt32)(0)
+const CURLFTPMETHOD_MULTICWD = (UInt32)(1)
+const CURLFTPMETHOD_NOCWD = (UInt32)(2)
+const CURLFTPMETHOD_SINGLECWD = (UInt32)(3)
+const CURLFTPMETHOD_LAST = (UInt32)(4)
+# end enum curl_ftpmethod
+
+const CURLHEADER_UNIFIED = 0
+const CURLHEADER_SEPARATE = 1 << 0
+const CURLPROTO_HTTP = 1 << 0
+const CURLPROTO_HTTPS = 1 << 1
+const CURLPROTO_FTP = 1 << 2
+const CURLPROTO_FTPS = 1 << 3
+const CURLPROTO_SCP = 1 << 4
+const CURLPROTO_SFTP = 1 << 5
+const CURLPROTO_TELNET = 1 << 6
+const CURLPROTO_LDAP = 1 << 7
+const CURLPROTO_LDAPS = 1 << 8
+const CURLPROTO_DICT = 1 << 9
+const CURLPROTO_FILE = 1 << 10
+const CURLPROTO_TFTP = 1 << 11
+const CURLPROTO_IMAP = 1 << 12
+const CURLPROTO_IMAPS = 1 << 13
+const CURLPROTO_POP3 = 1 << 14
+const CURLPROTO_POP3S = 1 << 15
+const CURLPROTO_SMTP = 1 << 16
+const CURLPROTO_SMTPS = 1 << 17
+const CURLPROTO_RTSP = 1 << 18
+const CURLPROTO_RTMP = 1 << 19
+const CURLPROTO_RTMPT = 1 << 20
+const CURLPROTO_RTMPE = 1 << 21
+const CURLPROTO_RTMPTE = 1 << 22
+const CURLPROTO_RTMPS = 1 << 23
+const CURLPROTO_RTMPTS = 1 << 24
+const CURLPROTO_GOPHER = 1 << 25
+const CURLPROTO_SMB = 1 << 26
+const CURLPROTO_SMBS = 1 << 27
+const CURLPROTO_ALL = ~0
+const CURLOPTTYPE_LONG = 0
+const CURLOPTTYPE_OBJECTPOINT = 10000
+const CURLOPTTYPE_STRINGPOINT = 10000
+const CURLOPTTYPE_FUNCTIONPOINT = 20000
+const CURLOPTTYPE_OFF_T = 30000
+
+# Skipping MacroDefinition: CINIT ( na , t , nu ) CURLOPT_ ## na = CURLOPTTYPE_ ## t + nu
+
+# begin enum CURLoption
+const CURLoption = UInt32
 const CURLOPT_WRITEDATA = (UInt32)(10001)
 const CURLOPT_URL = (UInt32)(10002)
 const CURLOPT_PORT = (UInt32)(3)
@@ -426,134 +757,7 @@ const CURLOPT_TLS13_CIPHERS = (UInt32)(10276)
 const CURLOPT_PROXY_TLS13_CIPHERS = (UInt32)(10277)
 const CURLOPT_DISALLOW_USERNAME_IN_URL = (UInt32)(278)
 const CURLOPT_LASTENTRY = (UInt32)(279)
-# end enum ANONYMOUS_14
-
-const CURLOPT_ENCODING = CURLOPT_ACCEPT_ENCODING
-const CURLE_FTP_WEIRD_SERVER_REPLY = CURLE_WEIRD_SERVER_REPLY
-const CURLE_UNKNOWN_TELNET_OPTION = CURLE_UNKNOWN_OPTION
-const CURLE_SSL_PEER_CERTIFICATE = CURLE_PEER_FAILED_VERIFICATION
-const CURLE_OBSOLETE = CURLE_OBSOLETE50
-const CURLE_BAD_PASSWORD_ENTERED = CURLE_OBSOLETE46
-const CURLE_BAD_CALLING_ORDER = CURLE_OBSOLETE44
-const CURLE_FTP_USER_PASSWORD_INCORRECT = CURLE_OBSOLETE10
-const CURLE_FTP_CANT_RECONNECT = CURLE_OBSOLETE16
-const CURLE_FTP_COULDNT_GET_SIZE = CURLE_OBSOLETE32
-const CURLE_FTP_COULDNT_SET_ASCII = CURLE_OBSOLETE29
-const CURLE_FTP_WEIRD_USER_REPLY = CURLE_OBSOLETE12
-const CURLE_FTP_WRITE_ERROR = CURLE_OBSOLETE20
-const CURLE_LIBRARY_NOT_FOUND = CURLE_OBSOLETE40
-const CURLE_MALFORMAT_USER = CURLE_OBSOLETE24
-const CURLE_SHARE_IN_USE = CURLE_OBSOLETE57
-const CURLE_URL_MALFORMAT_USER = CURLE_NOT_BUILT_IN
-const CURLE_FTP_ACCESS_DENIED = CURLE_REMOTE_ACCESS_DENIED
-const CURLE_FTP_COULDNT_SET_BINARY = CURLE_FTP_COULDNT_SET_TYPE
-const CURLE_FTP_QUOTE_ERROR = CURLE_QUOTE_ERROR
-const CURLE_TFTP_DISKFULL = CURLE_REMOTE_DISK_FULL
-const CURLE_TFTP_EXISTS = CURLE_REMOTE_FILE_EXISTS
-const CURLE_HTTP_RANGE_ERROR = CURLE_RANGE_ERROR
-const CURLE_FTP_SSL_FAILED = CURLE_USE_SSL_FAILED
-const CURLE_OPERATION_TIMEOUTED = CURLE_OPERATION_TIMEDOUT
-const CURLE_HTTP_NOT_FOUND = CURLE_HTTP_RETURNED_ERROR
-const CURLE_HTTP_PORT_FAILED = CURLE_INTERFACE_FAILED
-const CURLE_FTP_COULDNT_STOR_FILE = CURLE_UPLOAD_FAILED
-const CURLE_FTP_PARTIAL_FILE = CURLE_PARTIAL_FILE
-const CURLE_FTP_BAD_DOWNLOAD_RESUME = CURLE_BAD_DOWNLOAD_RESUME
-const CURLE_ALREADY_COMPLETE = 99999
-const CURLOPT_FILE = CURLOPT_WRITEDATA
-const CURLOPT_INFILE = CURLOPT_READDATA
-const CURLOPT_WRITEHEADER = CURLOPT_HEADERDATA
-const CURLOPT_WRITEINFO = CURLOPT_OBSOLETE40
-const CURLOPT_CLOSEPOLICY = CURLOPT_OBSOLETE72
-
-# Skipping MacroDefinition: CURLAUTH_NONE ( ( unsigned long ) 0 )
-# Skipping MacroDefinition: CURLAUTH_BASIC ( ( ( unsigned long ) 1 ) << 0 )
-# Skipping MacroDefinition: CURLAUTH_DIGEST ( ( ( unsigned long ) 1 ) << 1 )
-# Skipping MacroDefinition: CURLAUTH_NEGOTIATE ( ( ( unsigned long ) 1 ) << 2 )
-
-# const CURLAUTH_GSSNEGOTIATE = CURLAUTH_NEGOTIATE
-# const CURLAUTH_GSSAPI = CURLAUTH_NEGOTIATE
-
-# Skipping MacroDefinition: CURLAUTH_NTLM ( ( ( unsigned long ) 1 ) << 3 )
-# Skipping MacroDefinition: CURLAUTH_DIGEST_IE ( ( ( unsigned long ) 1 ) << 4 )
-# Skipping MacroDefinition: CURLAUTH_NTLM_WB ( ( ( unsigned long ) 1 ) << 5 )
-# Skipping MacroDefinition: CURLAUTH_BEARER ( ( ( unsigned long ) 1 ) << 6 )
-# Skipping MacroDefinition: CURLAUTH_ONLY ( ( ( unsigned long ) 1 ) << 31 )
-
-# const CURLAUTH_ANY = ~CURLAUTH_DIGEST_IE
-
-# Skipping MacroDefinition: CURLAUTH_ANYSAFE ( ~ ( CURLAUTH_BASIC | CURLAUTH_DIGEST_IE ) )
-
-const CURLSSH_AUTH_ANY = ~0
-const CURLSSH_AUTH_NONE = 0
-const CURLSSH_AUTH_PUBLICKEY = 1 << 0
-const CURLSSH_AUTH_PASSWORD = 1 << 1
-const CURLSSH_AUTH_HOST = 1 << 2
-const CURLSSH_AUTH_KEYBOARD = 1 << 3
-const CURLSSH_AUTH_AGENT = 1 << 4
-const CURLSSH_AUTH_GSSAPI = 1 << 5
-const CURLSSH_AUTH_DEFAULT = CURLSSH_AUTH_ANY
-const CURLGSSAPI_DELEGATION_NONE = 0
-const CURLGSSAPI_DELEGATION_POLICY_FLAG = 1 << 0
-const CURLGSSAPI_DELEGATION_FLAG = 1 << 1
-const CURL_ERROR_SIZE = 256
-const CURLSSLOPT_ALLOW_BEAST = 1 << 0
-const CURLSSLOPT_NO_REVOKE = 1 << 1
-const CURL_HET_DEFAULT = Clong(200)
-
-# begin enum ANONYMOUS_9
-const ANONYMOUS_9 = UInt32
-const CURLUSESSL_NONE = (UInt32)(0)
-const CURLUSESSL_TRY = (UInt32)(1)
-const CURLUSESSL_CONTROL = (UInt32)(2)
-const CURLUSESSL_ALL = (UInt32)(3)
-const CURLUSESSL_LAST = (UInt32)(4)
-# end enum ANONYMOUS_9
-
-const CURLFTPSSL_NONE = CURLUSESSL_NONE
-const CURLFTPSSL_TRY = CURLUSESSL_TRY
-const CURLFTPSSL_CONTROL = CURLUSESSL_CONTROL
-const CURLFTPSSL_ALL = CURLUSESSL_ALL
-const CURLFTPSSL_LAST = CURLUSESSL_LAST
-const curl_usessl = Cvoid
-const curl_ftpssl = curl_usessl
-const CURLHEADER_UNIFIED = 0
-const CURLHEADER_SEPARATE = 1 << 0
-const CURLPROTO_HTTP = 1 << 0
-const CURLPROTO_HTTPS = 1 << 1
-const CURLPROTO_FTP = 1 << 2
-const CURLPROTO_FTPS = 1 << 3
-const CURLPROTO_SCP = 1 << 4
-const CURLPROTO_SFTP = 1 << 5
-const CURLPROTO_TELNET = 1 << 6
-const CURLPROTO_LDAP = 1 << 7
-const CURLPROTO_LDAPS = 1 << 8
-const CURLPROTO_DICT = 1 << 9
-const CURLPROTO_FILE = 1 << 10
-const CURLPROTO_TFTP = 1 << 11
-const CURLPROTO_IMAP = 1 << 12
-const CURLPROTO_IMAPS = 1 << 13
-const CURLPROTO_POP3 = 1 << 14
-const CURLPROTO_POP3S = 1 << 15
-const CURLPROTO_SMTP = 1 << 16
-const CURLPROTO_SMTPS = 1 << 17
-const CURLPROTO_RTSP = 1 << 18
-const CURLPROTO_RTMP = 1 << 19
-const CURLPROTO_RTMPT = 1 << 20
-const CURLPROTO_RTMPE = 1 << 21
-const CURLPROTO_RTMPTE = 1 << 22
-const CURLPROTO_RTMPS = 1 << 23
-const CURLPROTO_RTMPTS = 1 << 24
-const CURLPROTO_GOPHER = 1 << 25
-const CURLPROTO_SMB = 1 << 26
-const CURLPROTO_SMBS = 1 << 27
-const CURLPROTO_ALL = ~0
-const CURLOPTTYPE_LONG = 0
-const CURLOPTTYPE_OBJECTPOINT = 10000
-const CURLOPTTYPE_STRINGPOINT = 10000
-const CURLOPTTYPE_FUNCTIONPOINT = 20000
-const CURLOPTTYPE_OFF_T = 30000
-
-# Skipping MacroDefinition: CINIT ( na , t , nu ) CURLOPT_ ## na = CURLOPTTYPE_ ## t + nu
+# end enum CURLoption
 
 const CURLOPT_XFERINFODATA = CURLOPT_PROGRESSDATA
 const CURLOPT_SERVER_RESPONSE_TIMEOUT = CURLOPT_FTP_RESPONSE_TIMEOUT
@@ -569,8 +773,7 @@ const CURL_IPRESOLVE_V4 = 1
 const CURL_IPRESOLVE_V6 = 2
 const CURLOPT_RTSPHEADER = CURLOPT_HTTPHEADER
 
-# begin enum ANONYMOUS_15
-const ANONYMOUS_15 = UInt32
+# begin enum ANONYMOUS
 const CURL_HTTP_VERSION_NONE = (UInt32)(0)
 const CURL_HTTP_VERSION_1_0 = (UInt32)(1)
 const CURL_HTTP_VERSION_1_1 = (UInt32)(2)
@@ -578,17 +781,160 @@ const CURL_HTTP_VERSION_2_0 = (UInt32)(3)
 const CURL_HTTP_VERSION_2TLS = (UInt32)(4)
 const CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE = (UInt32)(5)
 const CURL_HTTP_VERSION_LAST = (UInt32)(6)
-# end enum ANONYMOUS_15
+# end enum ANONYMOUS
 
 const CURL_HTTP_VERSION_2 = CURL_HTTP_VERSION_2_0
+
+# begin enum ANONYMOUS
+const CURL_RTSPREQ_NONE = (UInt32)(0)
+const CURL_RTSPREQ_OPTIONS = (UInt32)(1)
+const CURL_RTSPREQ_DESCRIBE = (UInt32)(2)
+const CURL_RTSPREQ_ANNOUNCE = (UInt32)(3)
+const CURL_RTSPREQ_SETUP = (UInt32)(4)
+const CURL_RTSPREQ_PLAY = (UInt32)(5)
+const CURL_RTSPREQ_PAUSE = (UInt32)(6)
+const CURL_RTSPREQ_TEARDOWN = (UInt32)(7)
+const CURL_RTSPREQ_GET_PARAMETER = (UInt32)(8)
+const CURL_RTSPREQ_SET_PARAMETER = (UInt32)(9)
+const CURL_RTSPREQ_RECORD = (UInt32)(10)
+const CURL_RTSPREQ_RECEIVE = (UInt32)(11)
+const CURL_RTSPREQ_LAST = (UInt32)(12)
+# end enum ANONYMOUS
+
+# begin enum CURL_NETRC_OPTION
+const CURL_NETRC_OPTION = UInt32
+const CURL_NETRC_IGNORED = (UInt32)(0)
+const CURL_NETRC_OPTIONAL = (UInt32)(1)
+const CURL_NETRC_REQUIRED = (UInt32)(2)
+const CURL_NETRC_LAST = (UInt32)(3)
+# end enum CURL_NETRC_OPTION
+
+# begin enum ANONYMOUS
+const CURL_SSLVERSION_DEFAULT = (UInt32)(0)
+const CURL_SSLVERSION_TLSv1 = (UInt32)(1)
+const CURL_SSLVERSION_SSLv2 = (UInt32)(2)
+const CURL_SSLVERSION_SSLv3 = (UInt32)(3)
+const CURL_SSLVERSION_TLSv1_0 = (UInt32)(4)
+const CURL_SSLVERSION_TLSv1_1 = (UInt32)(5)
+const CURL_SSLVERSION_TLSv1_2 = (UInt32)(6)
+const CURL_SSLVERSION_TLSv1_3 = (UInt32)(7)
+const CURL_SSLVERSION_LAST = (UInt32)(8)
+# end enum ANONYMOUS
+
+# begin enum ANONYMOUS
+const CURL_SSLVERSION_MAX_NONE = (UInt32)(0)
+const CURL_SSLVERSION_MAX_DEFAULT = (UInt32)(65536)
+const CURL_SSLVERSION_MAX_TLSv1_0 = (UInt32)(262144)
+const CURL_SSLVERSION_MAX_TLSv1_1 = (UInt32)(327680)
+const CURL_SSLVERSION_MAX_TLSv1_2 = (UInt32)(393216)
+const CURL_SSLVERSION_MAX_TLSv1_3 = (UInt32)(458752)
+const CURL_SSLVERSION_MAX_LAST = (UInt32)(524288)
+# end enum ANONYMOUS
+
+# begin enum CURL_TLSAUTH
+const CURL_TLSAUTH = UInt32
+const CURL_TLSAUTH_NONE = (UInt32)(0)
+const CURL_TLSAUTH_SRP = (UInt32)(1)
+const CURL_TLSAUTH_LAST = (UInt32)(2)
+# end enum CURL_TLSAUTH
+
 const CURL_REDIR_GET_ALL = 0
 const CURL_REDIR_POST_301 = 1
 const CURL_REDIR_POST_302 = 2
 const CURL_REDIR_POST_303 = 4
 const CURL_REDIR_POST_ALL = (CURL_REDIR_POST_301 | CURL_REDIR_POST_302) | CURL_REDIR_POST_303
 
+# begin enum curl_TimeCond
+const curl_TimeCond = UInt32
+const CURL_TIMECOND_NONE = (UInt32)(0)
+const CURL_TIMECOND_IFMODSINCE = (UInt32)(1)
+const CURL_TIMECOND_IFUNMODSINCE = (UInt32)(2)
+const CURL_TIMECOND_LASTMOD = (UInt32)(3)
+const CURL_TIMECOND_LAST = (UInt32)(4)
+# end enum curl_TimeCond
+
 # Skipping MacroDefinition: CURL_ZERO_TERMINATED ( ( size_t ) - 1 )
-# Skipping MacroDefinition: CFINIT ( name ) CURLFORM_ ## name
+
+struct curl_mime_s end
+
+const curl_mime = Cvoid
+
+struct curl_mimepart_s end
+
+const curl_mimepart = Cvoid
+
+# Skipping MacroDefinition: CFINIT ( name ) CURLFORM_ ## name.
+
+# begin enum CURLformoption
+const CURLformoption = UInt32
+const CURLFORM_NOTHING = (UInt32)(0)
+const CURLFORM_COPYNAME = (UInt32)(1)
+const CURLFORM_PTRNAME = (UInt32)(2)
+const CURLFORM_NAMELENGTH = (UInt32)(3)
+const CURLFORM_COPYCONTENTS = (UInt32)(4)
+const CURLFORM_PTRCONTENTS = (UInt32)(5)
+const CURLFORM_CONTENTSLENGTH = (UInt32)(6)
+const CURLFORM_FILECONTENT = (UInt32)(7)
+const CURLFORM_ARRAY = (UInt32)(8)
+const CURLFORM_OBSOLETE = (UInt32)(9)
+const CURLFORM_FILE = (UInt32)(10)
+const CURLFORM_BUFFER = (UInt32)(11)
+const CURLFORM_BUFFERPTR = (UInt32)(12)
+const CURLFORM_BUFFERLENGTH = (UInt32)(13)
+const CURLFORM_CONTENTTYPE = (UInt32)(14)
+const CURLFORM_CONTENTHEADER = (UInt32)(15)
+const CURLFORM_FILENAME = (UInt32)(16)
+const CURLFORM_END = (UInt32)(17)
+const CURLFORM_OBSOLETE2 = (UInt32)(18)
+const CURLFORM_STREAM = (UInt32)(19)
+const CURLFORM_CONTENTLEN = (UInt32)(20)
+const CURLFORM_LASTENTRY = (UInt32)(21)
+# end enum CURLformoption
+
+mutable struct curl_forms
+    option::CURLformoption
+    value::Ptr{UInt8}
+end
+
+# begin enum CURLFORMcode
+const CURLFORMcode = UInt32
+const CURL_FORMADD_OK = (UInt32)(0)
+const CURL_FORMADD_MEMORY = (UInt32)(1)
+const CURL_FORMADD_OPTION_TWICE = (UInt32)(2)
+const CURL_FORMADD_NULL = (UInt32)(3)
+const CURL_FORMADD_UNKNOWN_OPTION = (UInt32)(4)
+const CURL_FORMADD_INCOMPLETE = (UInt32)(5)
+const CURL_FORMADD_ILLEGAL_ARRAY = (UInt32)(6)
+const CURL_FORMADD_DISABLED = (UInt32)(7)
+const CURL_FORMADD_LAST = (UInt32)(8)
+# end enum CURLFORMcode
+
+const curl_formget_callback = Ptr{Cvoid}
+
+mutable struct curl_slist
+    data::Ptr{UInt8}
+    next::Ptr{Cvoid}
+end
+
+const curl_ssl_backend = Cvoid
+
+# begin enum CURLsslset
+const CURLsslset = UInt32
+const CURLSSLSET_OK = (UInt32)(0)
+const CURLSSLSET_UNKNOWN_BACKEND = (UInt32)(1)
+const CURLSSLSET_TOO_LATE = (UInt32)(2)
+const CURLSSLSET_NO_BACKENDS = (UInt32)(3)
+# end enum CURLsslset
+
+mutable struct curl_certinfo
+    num_of_certs::Cint
+    certinfo::Ptr{Ptr{Cvoid}}
+end
+
+mutable struct curl_tlssessioninfo
+    backend::curl_sslbackend
+    internals::Ptr{Cvoid}
+end
 
 const CURLINFO_STRING = 0x00100000
 const CURLINFO_LONG = 0x00200000
@@ -600,8 +946,8 @@ const CURLINFO_OFF_T = 0x00600000
 const CURLINFO_MASK = 0x000fffff
 const CURLINFO_TYPEMASK = 0x00f00000
 
-# begin enum ANONYMOUS_23
-const ANONYMOUS_23 = UInt32
+# begin enum CURLINFO
+const CURLINFO = UInt32
 const CURLINFO_NONE = (UInt32)(0)
 const CURLINFO_EFFECTIVE_URL = (UInt32)(1048577)
 const CURLINFO_RESPONSE_CODE = (UInt32)(2097154)
@@ -667,9 +1013,21 @@ const CURLINFO_STARTTRANSFER_TIME_T = (UInt32)(6291510)
 const CURLINFO_REDIRECT_TIME_T = (UInt32)(6291511)
 const CURLINFO_APPCONNECT_TIME_T = (UInt32)(6291512)
 const CURLINFO_LASTONE = (UInt32)(56)
-# end enum ANONYMOUS_23
+# end enum CURLINFO
 
 const CURLINFO_HTTP_CODE = CURLINFO_RESPONSE_CODE
+
+# begin enum curl_closepolicy
+const curl_closepolicy = UInt32
+const CURLCLOSEPOLICY_NONE = (UInt32)(0)
+const CURLCLOSEPOLICY_OLDEST = (UInt32)(1)
+const CURLCLOSEPOLICY_LEAST_RECENTLY_USED = (UInt32)(2)
+const CURLCLOSEPOLICY_LEAST_TRAFFIC = (UInt32)(3)
+const CURLCLOSEPOLICY_SLOWEST = (UInt32)(4)
+const CURLCLOSEPOLICY_CALLBACK = (UInt32)(5)
+const CURLCLOSEPOLICY_LAST = (UInt32)(6)
+# end enum curl_closepolicy
+
 const CURL_GLOBAL_SSL = 1 << 0
 const CURL_GLOBAL_WIN32 = 1 << 1
 const CURL_GLOBAL_ALL = CURL_GLOBAL_SSL | CURL_GLOBAL_WIN32
@@ -677,17 +1035,82 @@ const CURL_GLOBAL_NOTHING = 0
 const CURL_GLOBAL_DEFAULT = CURL_GLOBAL_ALL
 const CURL_GLOBAL_ACK_EINTR = 1 << 2
 
-# begin enum ANONYMOUS_29
-const ANONYMOUS_29 = UInt32
+# begin enum curl_lock_data
+const curl_lock_data = UInt32
+const CURL_LOCK_DATA_NONE = (UInt32)(0)
+const CURL_LOCK_DATA_SHARE = (UInt32)(1)
+const CURL_LOCK_DATA_COOKIE = (UInt32)(2)
+const CURL_LOCK_DATA_DNS = (UInt32)(3)
+const CURL_LOCK_DATA_SSL_SESSION = (UInt32)(4)
+const CURL_LOCK_DATA_CONNECT = (UInt32)(5)
+const CURL_LOCK_DATA_PSL = (UInt32)(6)
+const CURL_LOCK_DATA_LAST = (UInt32)(7)
+# end enum curl_lock_data
+
+# begin enum curl_lock_access
+const curl_lock_access = UInt32
+const CURL_LOCK_ACCESS_NONE = (UInt32)(0)
+const CURL_LOCK_ACCESS_SHARED = (UInt32)(1)
+const CURL_LOCK_ACCESS_SINGLE = (UInt32)(2)
+const CURL_LOCK_ACCESS_LAST = (UInt32)(3)
+# end enum curl_lock_access
+
+const curl_lock_function = Ptr{Cvoid}
+const curl_unlock_function = Ptr{Cvoid}
+
+# begin enum CURLSHcode
+const CURLSHcode = UInt32
+const CURLSHE_OK = (UInt32)(0)
+const CURLSHE_BAD_OPTION = (UInt32)(1)
+const CURLSHE_IN_USE = (UInt32)(2)
+const CURLSHE_INVALID = (UInt32)(3)
+const CURLSHE_NOMEM = (UInt32)(4)
+const CURLSHE_NOT_BUILT_IN = (UInt32)(5)
+const CURLSHE_LAST = (UInt32)(6)
+# end enum CURLSHcode
+
+# begin enum CURLSHoption
+const CURLSHoption = UInt32
+const CURLSHOPT_NONE = (UInt32)(0)
+const CURLSHOPT_SHARE = (UInt32)(1)
+const CURLSHOPT_UNSHARE = (UInt32)(2)
+const CURLSHOPT_LOCKFUNC = (UInt32)(3)
+const CURLSHOPT_UNLOCKFUNC = (UInt32)(4)
+const CURLSHOPT_USERDATA = (UInt32)(5)
+const CURLSHOPT_LAST = (UInt32)(6)
+# end enum CURLSHoption
+
+# begin enum CURLversion
+const CURLversion = UInt32
 const CURLVERSION_FIRST = (UInt32)(0)
 const CURLVERSION_SECOND = (UInt32)(1)
 const CURLVERSION_THIRD = (UInt32)(2)
 const CURLVERSION_FOURTH = (UInt32)(3)
 const CURLVERSION_FIFTH = (UInt32)(4)
 const CURLVERSION_LAST = (UInt32)(5)
-# end enum ANONYMOUS_29
+# end enum CURLversion
 
 const CURLVERSION_NOW = CURLVERSION_FIFTH
+
+mutable struct curl_version_info_data
+    age::CURLversion
+    version::Ptr{UInt8}
+    version_num::UInt32
+    host::Ptr{UInt8}
+    features::Int32
+    ssl_version::Ptr{UInt8}
+    ssl_version_num::Int32
+    libz_version::Ptr{UInt8}
+    protocols::Ptr{Ptr{UInt8}}
+    ares::Ptr{UInt8}
+    ares_num::Int32
+    libidn::Ptr{UInt8}
+    iconv_ver_num::Int32
+    libssh_version::Ptr{UInt8}
+    brotli_ver_num::UInt32
+    brotli_version::Ptr{UInt8}
+end
+
 const CURL_VERSION_IPV6 = 1 << 0
 const CURL_VERSION_KERBEROS4 = 1 << 1
 const CURL_VERSION_SSL = 1 << 2
@@ -719,8 +1142,17 @@ const CURLPAUSE_SEND_CONT = 0
 const CURLPAUSE_ALL = CURLPAUSE_RECV | CURLPAUSE_SEND
 const CURLPAUSE_CONT = CURLPAUSE_RECV_CONT | CURLPAUSE_SEND_CONT
 
-# begin enum ANONYMOUS_30
-const ANONYMOUS_30 = Cint
+# Skipping MacroDefinition: curl_easy_setopt ( handle , opt , param ) curl_easy_setopt ( handle , opt , param )
+# Skipping MacroDefinition: curl_easy_getinfo ( handle , info , arg ) curl_easy_getinfo ( handle , info , arg )
+# Skipping MacroDefinition: curl_share_setopt ( share , opt , param ) curl_share_setopt ( share , opt , param )
+# Skipping MacroDefinition: curl_multi_setopt ( handle , opt , param ) curl_multi_setopt ( handle , opt , param )
+
+# multi.h
+
+const CURLM = Cvoid
+
+# begin enum CURLMcode
+const CURLMcode = Cint
 const CURLM_CALL_MULTI_PERFORM = (Int32)(-1)
 const CURLM_OK = (Int32)(0)
 const CURLM_BAD_HANDLE = (Int32)(1)
@@ -732,15 +1164,36 @@ const CURLM_UNKNOWN_OPTION = (Int32)(6)
 const CURLM_ADDED_ALREADY = (Int32)(7)
 const CURLM_RECURSIVE_API_CALL = (Int32)(8)
 const CURLM_LAST = (Int32)(9)
-# end enum ANONYMOUS_30
+# end enum CURLMcode
 
 const CURLM_CALL_MULTI_SOCKET = CURLM_CALL_MULTI_PERFORM
 const CURLPIPE_NOTHING = Clong(0)
 const CURLPIPE_HTTP1 = Clong(1)
 const CURLPIPE_MULTIPLEX = Clong(2)
+
+# begin enum CURLMSG
+const CURLMSG = UInt32
+const CURLMSG_NONE = (UInt32)(0)
+const CURLMSG_DONE = (UInt32)(1)
+const CURLMSG_LAST = (UInt32)(2)
+# end enum CURLMSG
+
+mutable struct CURLMsg
+    msg::CURLMSG
+    easy_handle::Ptr{CURL}
+    data::Cvoid
+end
+
 const CURL_WAIT_POLLIN = 0x0001
 const CURL_WAIT_POLLPRI = 0x0002
 const CURL_WAIT_POLLOUT = 0x0004
+
+mutable struct curl_waitfd
+    fd::curl_socket_t
+    events::Int16
+    revents::Int16
+end
+
 const CURL_POLL_NONE = 0
 const CURL_POLL_IN = 1
 const CURL_POLL_OUT = 2
@@ -751,483 +1204,14 @@ const CURL_CSELECT_IN = 0x01
 const CURL_CSELECT_OUT = 0x02
 const CURL_CSELECT_ERR = 0x04
 
-# Skipping MacroDefinition: curl_multi_socket ( x , y , z ) curl_multi_socket_action ( x , y , 0 , z )
-# Skipping MacroDefinition: CINIT ( name , type , num ) CURLMOPT_ ## name = CURLOPTTYPE_ ## type + num
-
-const CURL_PUSH_OK = 0
-const CURL_PUSH_DENY = 1
-
-# Skipping MacroDefinition: curl_easy_setopt ( handle , opt , param ) curl_easy_setopt ( handle , opt , param )
-# Skipping MacroDefinition: curl_easy_getinfo ( handle , info , arg ) curl_easy_getinfo ( handle , info , arg )
-# Skipping MacroDefinition: curl_share_setopt ( share , opt , param ) curl_share_setopt ( share , opt , param )
-# Skipping MacroDefinition: curl_multi_setopt ( handle , opt , param ) curl_multi_setopt ( handle , opt , param )
-
-const CURL = Cvoid
-const CURLSH = Cvoid
-const curl_socket_t = Cint
-const curl_sslbackend = Cvoid
-
-mutable struct curl_httppost
-    next::Ptr{Cvoid}
-    name::Ptr{UInt8}
-    namelength::Clong
-    contents::Ptr{UInt8}
-    contentslength::Clong
-    buffer::Ptr{UInt8}
-    bufferlength::Clong
-    contenttype::Ptr{UInt8}
-    contentheader::Ptr{Cvoid}
-    more::Ptr{Cvoid}
-    flags::Clong
-    showfilename::Ptr{UInt8}
-    userp::Ptr{Cvoid}
-    contentlen::curl_off_t
-end
-
-const curl_progress_callback = Ptr{Cvoid}
-const curl_xferinfo_callback = Ptr{Cvoid}
-const curl_write_callback = Ptr{Cvoid}
-const curl_resolver_start_callback = Ptr{Cvoid}
-
-# begin enum ANONYMOUS_2
-const ANONYMOUS_2 = UInt32
-const CURLFILETYPE_FILE = (UInt32)(0)
-const CURLFILETYPE_DIRECTORY = (UInt32)(1)
-const CURLFILETYPE_SYMLINK = (UInt32)(2)
-const CURLFILETYPE_DEVICE_BLOCK = (UInt32)(3)
-const CURLFILETYPE_DEVICE_CHAR = (UInt32)(4)
-const CURLFILETYPE_NAMEDPIPE = (UInt32)(5)
-const CURLFILETYPE_SOCKET = (UInt32)(6)
-const CURLFILETYPE_DOOR = (UInt32)(7)
-const CURLFILETYPE_UNKNOWN = (UInt32)(8)
-# end enum ANONYMOUS_2
-
-const curlfiletype = Cvoid
-
-mutable struct curl_fileinfo
-    filename::Ptr{UInt8}
-    filetype::curlfiletype
-    time::time_t
-    perm::UInt32
-    uid::Cint
-    gid::Cint
-    size::curl_off_t
-    hardlinks::Clong
-    strings::Cvoid
-    flags::UInt32
-    b_data::Ptr{UInt8}
-    b_size::Csize_t
-    b_used::Csize_t
-end
-
-const curl_chunk_bgn_callback = Ptr{Cvoid}
-const curl_chunk_end_callback = Ptr{Cvoid}
-const curl_fnmatch_callback = Ptr{Cvoid}
-const curl_seek_callback = Ptr{Cvoid}
-const curl_read_callback = Ptr{Cvoid}
-
-# begin enum ANONYMOUS_3
-const ANONYMOUS_3 = UInt32
-const CURLSOCKTYPE_IPCXN = (UInt32)(0)
-const CURLSOCKTYPE_ACCEPT = (UInt32)(1)
-const CURLSOCKTYPE_LAST = (UInt32)(2)
-# end enum ANONYMOUS_3
-
-const curlsocktype = Cvoid
-const curl_sockopt_callback = Ptr{Cvoid}
-
-mutable struct curl_sockaddr
-    family::Cint
-    socktype::Cint
-    protocol::Cint
-    addrlen::UInt32
-    addr::Cvoid
-end
-
-const curl_opensocket_callback = Ptr{Cvoid}
-const curl_closesocket_callback = Ptr{Cvoid}
-
-# begin enum ANONYMOUS_4
-const ANONYMOUS_4 = UInt32
-const CURLIOE_OK = (UInt32)(0)
-const CURLIOE_UNKNOWNCMD = (UInt32)(1)
-const CURLIOE_FAILRESTART = (UInt32)(2)
-const CURLIOE_LAST = (UInt32)(3)
-# end enum ANONYMOUS_4
-
-const curlioerr = Cvoid
-
-# begin enum ANONYMOUS_5
-const ANONYMOUS_5 = UInt32
-const CURLIOCMD_NOP = (UInt32)(0)
-const CURLIOCMD_RESTARTREAD = (UInt32)(1)
-const CURLIOCMD_LAST = (UInt32)(2)
-# end enum ANONYMOUS_5
-
-const curliocmd = Cvoid
-const curl_ioctl_callback = Ptr{Cvoid}
-const curl_malloc_callback = Ptr{Cvoid}
-const curl_free_callback = Ptr{Cvoid}
-const curl_realloc_callback = Ptr{Cvoid}
-const curl_strdup_callback = Ptr{Cvoid}
-const curl_calloc_callback = Ptr{Cvoid}
-
-# begin enum ANONYMOUS_6
-const ANONYMOUS_6 = UInt32
-const CURLINFO_TEXT = (UInt32)(0)
-const CURLINFO_HEADER_IN = (UInt32)(1)
-const CURLINFO_HEADER_OUT = (UInt32)(2)
-const CURLINFO_DATA_IN = (UInt32)(3)
-const CURLINFO_DATA_OUT = (UInt32)(4)
-const CURLINFO_SSL_DATA_IN = (UInt32)(5)
-const CURLINFO_SSL_DATA_OUT = (UInt32)(6)
-const CURLINFO_END = (UInt32)(7)
-# end enum ANONYMOUS_6
-
-const curl_infotype = Cvoid
-const curl_debug_callback = Ptr{Cvoid}
-const CURLcode = Cvoid
-const curl_conv_callback = Ptr{Cvoid}
-const curl_ssl_ctx_callback = Ptr{Cvoid}
-
-# begin enum ANONYMOUS_8
-const ANONYMOUS_8 = UInt32
-const CURLPROXY_HTTP = (UInt32)(0)
-const CURLPROXY_HTTP_1_0 = (UInt32)(1)
-const CURLPROXY_HTTPS = (UInt32)(2)
-const CURLPROXY_SOCKS4 = (UInt32)(4)
-const CURLPROXY_SOCKS5 = (UInt32)(5)
-const CURLPROXY_SOCKS4A = (UInt32)(6)
-const CURLPROXY_SOCKS5_HOSTNAME = (UInt32)(7)
-# end enum ANONYMOUS_8
-
-const curl_proxytype = Cvoid
-
-# begin enum curl_khtype
-const curl_khtype = UInt32
-const CURLKHTYPE_UNKNOWN = (UInt32)(0)
-const CURLKHTYPE_RSA1 = (UInt32)(1)
-const CURLKHTYPE_RSA = (UInt32)(2)
-const CURLKHTYPE_DSS = (UInt32)(3)
-const CURLKHTYPE_ECDSA = (UInt32)(4)
-const CURLKHTYPE_ED25519 = (UInt32)(5)
-# end enum curl_khtype
-
-mutable struct curl_khkey
-    key::Ptr{UInt8}
-    len::Csize_t
-    keytype::Cvoid
-end
-
-# begin enum curl_khstat
-const curl_khstat = UInt32
-const CURLKHSTAT_FINE_ADD_TO_FILE = (UInt32)(0)
-const CURLKHSTAT_FINE = (UInt32)(1)
-const CURLKHSTAT_REJECT = (UInt32)(2)
-const CURLKHSTAT_DEFER = (UInt32)(3)
-const CURLKHSTAT_LAST = (UInt32)(4)
-# end enum curl_khstat
-
-# begin enum curl_khmatch
-const curl_khmatch = UInt32
-const CURLKHMATCH_OK = (UInt32)(0)
-const CURLKHMATCH_MISMATCH = (UInt32)(1)
-const CURLKHMATCH_MISSING = (UInt32)(2)
-const CURLKHMATCH_LAST = (UInt32)(3)
-# end enum curl_khmatch
-
-const curl_sshkeycallback = Ptr{Cvoid}
-
-# begin enum ANONYMOUS_10
-const ANONYMOUS_10 = UInt32
-const CURLFTPSSL_CCC_NONE = (UInt32)(0)
-const CURLFTPSSL_CCC_PASSIVE = (UInt32)(1)
-const CURLFTPSSL_CCC_ACTIVE = (UInt32)(2)
-const CURLFTPSSL_CCC_LAST = (UInt32)(3)
-# end enum ANONYMOUS_10
-
-const curl_ftpccc = Cvoid
-
-# begin enum ANONYMOUS_11
-const ANONYMOUS_11 = UInt32
-const CURLFTPAUTH_DEFAULT = (UInt32)(0)
-const CURLFTPAUTH_SSL = (UInt32)(1)
-const CURLFTPAUTH_TLS = (UInt32)(2)
-const CURLFTPAUTH_LAST = (UInt32)(3)
-# end enum ANONYMOUS_11
-
-const curl_ftpauth = Cvoid
-
-# begin enum ANONYMOUS_12
-const ANONYMOUS_12 = UInt32
-const CURLFTP_CREATE_DIR_NONE = (UInt32)(0)
-const CURLFTP_CREATE_DIR = (UInt32)(1)
-const CURLFTP_CREATE_DIR_RETRY = (UInt32)(2)
-const CURLFTP_CREATE_DIR_LAST = (UInt32)(3)
-# end enum ANONYMOUS_12
-
-const curl_ftpcreatedir = Cvoid
-
-# begin enum ANONYMOUS_13
-const ANONYMOUS_13 = UInt32
-const CURLFTPMETHOD_DEFAULT = (UInt32)(0)
-const CURLFTPMETHOD_MULTICWD = (UInt32)(1)
-const CURLFTPMETHOD_NOCWD = (UInt32)(2)
-const CURLFTPMETHOD_SINGLECWD = (UInt32)(3)
-const CURLFTPMETHOD_LAST = (UInt32)(4)
-# end enum ANONYMOUS_13
-
-const curl_ftpmethod = Cvoid
-const CURLoption = Cvoid
-
-# begin enum ANONYMOUS_16
-const ANONYMOUS_16 = UInt32
-const CURL_RTSPREQ_NONE = (UInt32)(0)
-const CURL_RTSPREQ_OPTIONS = (UInt32)(1)
-const CURL_RTSPREQ_DESCRIBE = (UInt32)(2)
-const CURL_RTSPREQ_ANNOUNCE = (UInt32)(3)
-const CURL_RTSPREQ_SETUP = (UInt32)(4)
-const CURL_RTSPREQ_PLAY = (UInt32)(5)
-const CURL_RTSPREQ_PAUSE = (UInt32)(6)
-const CURL_RTSPREQ_TEARDOWN = (UInt32)(7)
-const CURL_RTSPREQ_GET_PARAMETER = (UInt32)(8)
-const CURL_RTSPREQ_SET_PARAMETER = (UInt32)(9)
-const CURL_RTSPREQ_RECORD = (UInt32)(10)
-const CURL_RTSPREQ_RECEIVE = (UInt32)(11)
-const CURL_RTSPREQ_LAST = (UInt32)(12)
-# end enum ANONYMOUS_16
-
-# begin enum CURL_NETRC_OPTION
-const CURL_NETRC_OPTION = UInt32
-const CURL_NETRC_IGNORED = (UInt32)(0)
-const CURL_NETRC_OPTIONAL = (UInt32)(1)
-const CURL_NETRC_REQUIRED = (UInt32)(2)
-const CURL_NETRC_LAST = (UInt32)(3)
-# end enum CURL_NETRC_OPTION
-
-# begin enum ANONYMOUS_17
-const ANONYMOUS_17 = UInt32
-const CURL_SSLVERSION_DEFAULT = (UInt32)(0)
-const CURL_SSLVERSION_TLSv1 = (UInt32)(1)
-const CURL_SSLVERSION_SSLv2 = (UInt32)(2)
-const CURL_SSLVERSION_SSLv3 = (UInt32)(3)
-const CURL_SSLVERSION_TLSv1_0 = (UInt32)(4)
-const CURL_SSLVERSION_TLSv1_1 = (UInt32)(5)
-const CURL_SSLVERSION_TLSv1_2 = (UInt32)(6)
-const CURL_SSLVERSION_TLSv1_3 = (UInt32)(7)
-const CURL_SSLVERSION_LAST = (UInt32)(8)
-# end enum ANONYMOUS_17
-
-# begin enum ANONYMOUS_18
-const ANONYMOUS_18 = UInt32
-const CURL_SSLVERSION_MAX_NONE = (UInt32)(0)
-const CURL_SSLVERSION_MAX_DEFAULT = (UInt32)(65536)
-const CURL_SSLVERSION_MAX_TLSv1_0 = (UInt32)(262144)
-const CURL_SSLVERSION_MAX_TLSv1_1 = (UInt32)(327680)
-const CURL_SSLVERSION_MAX_TLSv1_2 = (UInt32)(393216)
-const CURL_SSLVERSION_MAX_TLSv1_3 = (UInt32)(458752)
-const CURL_SSLVERSION_MAX_LAST = (UInt32)(524288)
-# end enum ANONYMOUS_18
-
-# begin enum CURL_TLSAUTH
-const CURL_TLSAUTH = UInt32
-const CURL_TLSAUTH_NONE = (UInt32)(0)
-const CURL_TLSAUTH_SRP = (UInt32)(1)
-const CURL_TLSAUTH_LAST = (UInt32)(2)
-# end enum CURL_TLSAUTH
-
-# begin enum ANONYMOUS_19
-const ANONYMOUS_19 = UInt32
-const CURL_TIMECOND_NONE = (UInt32)(0)
-const CURL_TIMECOND_IFMODSINCE = (UInt32)(1)
-const CURL_TIMECOND_IFUNMODSINCE = (UInt32)(2)
-const CURL_TIMECOND_LASTMOD = (UInt32)(3)
-const CURL_TIMECOND_LAST = (UInt32)(4)
-# end enum ANONYMOUS_19
-
-const curl_TimeCond = Cvoid
-
-struct curl_mime_s end
-
-const curl_mime = Cvoid
-
-struct curl_mimepart_s end
-
-const curl_mimepart = Cvoid
-
-# begin enum ANONYMOUS_20
-const ANONYMOUS_20 = UInt32
-const CURLFORM_NOTHING = (UInt32)(0)
-const CURLFORM_COPYNAME = (UInt32)(1)
-const CURLFORM_PTRNAME = (UInt32)(2)
-const CURLFORM_NAMELENGTH = (UInt32)(3)
-const CURLFORM_COPYCONTENTS = (UInt32)(4)
-const CURLFORM_PTRCONTENTS = (UInt32)(5)
-const CURLFORM_CONTENTSLENGTH = (UInt32)(6)
-const CURLFORM_FILECONTENT = (UInt32)(7)
-const CURLFORM_ARRAY = (UInt32)(8)
-const CURLFORM_OBSOLETE = (UInt32)(9)
-const CURLFORM_FILE = (UInt32)(10)
-const CURLFORM_BUFFER = (UInt32)(11)
-const CURLFORM_BUFFERPTR = (UInt32)(12)
-const CURLFORM_BUFFERLENGTH = (UInt32)(13)
-const CURLFORM_CONTENTTYPE = (UInt32)(14)
-const CURLFORM_CONTENTHEADER = (UInt32)(15)
-const CURLFORM_FILENAME = (UInt32)(16)
-const CURLFORM_END = (UInt32)(17)
-const CURLFORM_OBSOLETE2 = (UInt32)(18)
-const CURLFORM_STREAM = (UInt32)(19)
-const CURLFORM_CONTENTLEN = (UInt32)(20)
-const CURLFORM_LASTENTRY = (UInt32)(21)
-# end enum ANONYMOUS_20
-
-const CURLformoption = Cvoid
-
-mutable struct curl_forms
-    option::CURLformoption
-    value::Ptr{UInt8}
-end
-
-# begin enum ANONYMOUS_21
-const ANONYMOUS_21 = UInt32
-const CURL_FORMADD_OK = (UInt32)(0)
-const CURL_FORMADD_MEMORY = (UInt32)(1)
-const CURL_FORMADD_OPTION_TWICE = (UInt32)(2)
-const CURL_FORMADD_NULL = (UInt32)(3)
-const CURL_FORMADD_UNKNOWN_OPTION = (UInt32)(4)
-const CURL_FORMADD_INCOMPLETE = (UInt32)(5)
-const CURL_FORMADD_ILLEGAL_ARRAY = (UInt32)(6)
-const CURL_FORMADD_DISABLED = (UInt32)(7)
-const CURL_FORMADD_LAST = (UInt32)(8)
-# end enum ANONYMOUS_21
-
-const CURLFORMcode = Cvoid
-const curl_formget_callback = Ptr{Cvoid}
-
-mutable struct curl_slist
-    data::Ptr{UInt8}
-    next::Ptr{Cvoid}
-end
-
-const curl_ssl_backend = Cvoid
-
-# begin enum ANONYMOUS_22
-const ANONYMOUS_22 = UInt32
-const CURLSSLSET_OK = (UInt32)(0)
-const CURLSSLSET_UNKNOWN_BACKEND = (UInt32)(1)
-const CURLSSLSET_TOO_LATE = (UInt32)(2)
-const CURLSSLSET_NO_BACKENDS = (UInt32)(3)
-# end enum ANONYMOUS_22
-
-const CURLsslset = Cvoid
-
-mutable struct curl_certinfo
-    num_of_certs::Cint
-    certinfo::Ptr{Ptr{Cvoid}}
-end
-
-mutable struct curl_tlssessioninfo
-    backend::curl_sslbackend
-    internals::Ptr{Cvoid}
-end
-
-const CURLINFO = Cvoid
-
-# begin enum ANONYMOUS_24
-const ANONYMOUS_24 = UInt32
-const CURLCLOSEPOLICY_NONE = (UInt32)(0)
-const CURLCLOSEPOLICY_OLDEST = (UInt32)(1)
-const CURLCLOSEPOLICY_LEAST_RECENTLY_USED = (UInt32)(2)
-const CURLCLOSEPOLICY_LEAST_TRAFFIC = (UInt32)(3)
-const CURLCLOSEPOLICY_SLOWEST = (UInt32)(4)
-const CURLCLOSEPOLICY_CALLBACK = (UInt32)(5)
-const CURLCLOSEPOLICY_LAST = (UInt32)(6)
-# end enum ANONYMOUS_24
-
-const curl_closepolicy = Cvoid
-
-# begin enum ANONYMOUS_25
-const ANONYMOUS_25 = UInt32
-const CURL_LOCK_DATA_NONE = (UInt32)(0)
-const CURL_LOCK_DATA_SHARE = (UInt32)(1)
-const CURL_LOCK_DATA_COOKIE = (UInt32)(2)
-const CURL_LOCK_DATA_DNS = (UInt32)(3)
-const CURL_LOCK_DATA_SSL_SESSION = (UInt32)(4)
-const CURL_LOCK_DATA_CONNECT = (UInt32)(5)
-const CURL_LOCK_DATA_PSL = (UInt32)(6)
-const CURL_LOCK_DATA_LAST = (UInt32)(7)
-# end enum ANONYMOUS_25
-
-const curl_lock_data = Cvoid
-
-# begin enum ANONYMOUS_26
-const ANONYMOUS_26 = UInt32
-const CURL_LOCK_ACCESS_NONE = (UInt32)(0)
-const CURL_LOCK_ACCESS_SHARED = (UInt32)(1)
-const CURL_LOCK_ACCESS_SINGLE = (UInt32)(2)
-const CURL_LOCK_ACCESS_LAST = (UInt32)(3)
-# end enum ANONYMOUS_26
-
-const curl_lock_access = Cvoid
-const curl_lock_function = Ptr{Cvoid}
-const curl_unlock_function = Ptr{Cvoid}
-
-# begin enum ANONYMOUS_27
-const ANONYMOUS_27 = UInt32
-const CURLSHE_OK = (UInt32)(0)
-const CURLSHE_BAD_OPTION = (UInt32)(1)
-const CURLSHE_IN_USE = (UInt32)(2)
-const CURLSHE_INVALID = (UInt32)(3)
-const CURLSHE_NOMEM = (UInt32)(4)
-const CURLSHE_NOT_BUILT_IN = (UInt32)(5)
-const CURLSHE_LAST = (UInt32)(6)
-# end enum ANONYMOUS_27
-
-const CURLSHcode = Cvoid
-
-# begin enum ANONYMOUS_28
-const ANONYMOUS_28 = UInt32
-const CURLSHOPT_NONE = (UInt32)(0)
-const CURLSHOPT_SHARE = (UInt32)(1)
-const CURLSHOPT_UNSHARE = (UInt32)(2)
-const CURLSHOPT_LOCKFUNC = (UInt32)(3)
-const CURLSHOPT_UNLOCKFUNC = (UInt32)(4)
-const CURLSHOPT_USERDATA = (UInt32)(5)
-const CURLSHOPT_LAST = (UInt32)(6)
-# end enum ANONYMOUS_28
-
-const CURLSHoption = Cvoid
-const CURLversion = Cvoid
-const curl_version_info_data = Cvoid
-const CURLM = Cvoid
-const CURLMcode = Cvoid
-
-# begin enum ANONYMOUS_31
-const ANONYMOUS_31 = UInt32
-const CURLMSG_NONE = (UInt32)(0)
-const CURLMSG_DONE = (UInt32)(1)
-const CURLMSG_LAST = (UInt32)(2)
-# end enum ANONYMOUS_31
-
-const CURLMSG = Cvoid
-
-mutable struct CURLMsg
-    msg::CURLMSG
-    easy_handle::Ptr{CURL}
-    data::Cvoid
-end
-
-mutable struct curl_waitfd
-    fd::curl_socket_t
-    events::Int16
-    revents::Int16
-end
-
 const curl_socket_callback = Ptr{Cvoid}
 const curl_multi_timer_callback = Ptr{Cvoid}
 
-# begin enum ANONYMOUS_32
-const ANONYMOUS_32 = UInt32
+# Skipping MacroDefinition: curl_multi_socket ( x , y , z ) curl_multi_socket_action ( x , y , 0 , z )
+# Skipping MacroDefinition: CINIT ( name , type , num ) CURLMOPT_ ## name = CURLOPTTYPE_ ## type + num
+
+# begin enum CURLMoption
+const CURLMoption = UInt32
 const CURLMOPT_SOCKETFUNCTION = (UInt32)(20001)
 const CURLMOPT_SOCKETDATA = (UInt32)(10002)
 const CURLMOPT_PIPELINING = (UInt32)(3)
@@ -1244,9 +1228,10 @@ const CURLMOPT_MAX_TOTAL_CONNECTIONS = (UInt32)(13)
 const CURLMOPT_PUSHFUNCTION = (UInt32)(20014)
 const CURLMOPT_PUSHDATA = (UInt32)(10015)
 const CURLMOPT_LASTENTRY = (UInt32)(10016)
-# end enum ANONYMOUS_32
+# end enum CURLMoption
 
-const CURLMoption = Cvoid
+const CURL_PUSH_OK = 0
+const CURL_PUSH_DENY = 1
 
 struct curl_pushheaders end
 
