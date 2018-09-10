@@ -10,7 +10,7 @@ const CLANG_INCLUDES = [
 
 const SRC_DIR = abspath(@__DIR__, "..", "src")
 
-headers = map(x-> joinpath(CURL_PATH, x), ["curl.h", "easy.h", "multi.h"])
+headers = map(x -> joinpath(CURL_PATH, x), ["curl.h", "easy.h", "multi.h"])
 context = wrap_c.init(;
     headers = headers,
     clang_args = String[],
@@ -56,7 +56,7 @@ open(joinpath(SRC_DIR, "lC_exports_h.jl"), "w+") do exports_file
         for line in hashdefs
             m = match(r"^\s*#define\s+CURL(\w+)\s+(.+)", line)
 
-            if (m !== nothing)
+            if m !== nothing
                 c2 = replace(m.captures[2], "(unsigned long)" => "")
                 @printf defines_file "const CURL%-30s = %s\n"  m.captures[1]  c2
                 @printf exports_file "export CURL%s\n"  m.captures[1]
