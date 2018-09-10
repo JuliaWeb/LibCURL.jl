@@ -294,24 +294,6 @@ const CURLPROXY_SOCKS4A = (UInt32)(6)
 const CURLPROXY_SOCKS5_HOSTNAME = (UInt32)(7)
 # end enum curl_proxytype
 
-# Skipping MacroDefinition: CURLAUTH_NONE ( ( unsigned long ) 0 )
-# Skipping MacroDefinition: CURLAUTH_BASIC ( ( ( unsigned long ) 1 ) << 0 )
-# Skipping MacroDefinition: CURLAUTH_DIGEST ( ( ( unsigned long ) 1 ) << 1 )
-# Skipping MacroDefinition: CURLAUTH_NEGOTIATE ( ( ( unsigned long ) 1 ) << 2 )
-
-# const CURLAUTH_GSSNEGOTIATE = CURLAUTH_NEGOTIATE
-# const CURLAUTH_GSSAPI = CURLAUTH_NEGOTIATE
-
-# Skipping MacroDefinition: CURLAUTH_NTLM ( ( ( unsigned long ) 1 ) << 3 )
-# Skipping MacroDefinition: CURLAUTH_DIGEST_IE ( ( ( unsigned long ) 1 ) << 4 )
-# Skipping MacroDefinition: CURLAUTH_NTLM_WB ( ( ( unsigned long ) 1 ) << 5 )
-# Skipping MacroDefinition: CURLAUTH_BEARER ( ( ( unsigned long ) 1 ) << 6 )
-# Skipping MacroDefinition: CURLAUTH_ONLY ( ( ( unsigned long ) 1 ) << 31 )
-
-# const CURLAUTH_ANY = ~CURLAUTH_DIGEST_IE
-
-# Skipping MacroDefinition: CURLAUTH_ANYSAFE ( ~ ( CURLAUTH_BASIC | CURLAUTH_DIGEST_IE ) )
-
 const CURLSSH_AUTH_ANY = ~0
 const CURLSSH_AUTH_NONE = 0
 const CURLSSH_AUTH_PUBLICKEY = 1 << 0
@@ -450,8 +432,6 @@ const CURLOPTTYPE_OBJECTPOINT = 10000
 const CURLOPTTYPE_STRINGPOINT = 10000
 const CURLOPTTYPE_FUNCTIONPOINT = 20000
 const CURLOPTTYPE_OFF_T = 30000
-
-# Skipping MacroDefinition: CINIT ( na , t , nu ) CURLOPT_ ## na = CURLOPTTYPE_ ## t + nu
 
 # begin enum CURLoption
 const CURLoption = UInt32
@@ -812,8 +792,6 @@ const CURL_TIMECOND_LASTMOD = (UInt32)(3)
 const CURL_TIMECOND_LAST = (UInt32)(4)
 # end enum curl_TimeCond
 
-# Skipping MacroDefinition: CURL_ZERO_TERMINATED ( ( size_t ) - 1 )
-
 struct curl_mime_s end
 
 const curl_mime = Cvoid
@@ -821,8 +799,6 @@ const curl_mime = Cvoid
 struct curl_mimepart_s end
 
 const curl_mimepart = Cvoid
-
-# Skipping MacroDefinition: CFINIT ( name ) CURLFORM_ ## name.
 
 # begin enum CURLformoption
 const CURLformoption = UInt32
@@ -1101,11 +1077,6 @@ const CURLPAUSE_SEND_CONT = 0
 const CURLPAUSE_ALL = CURLPAUSE_RECV | CURLPAUSE_SEND
 const CURLPAUSE_CONT = CURLPAUSE_RECV_CONT | CURLPAUSE_SEND_CONT
 
-# Skipping MacroDefinition: curl_easy_setopt ( handle , opt , param ) curl_easy_setopt ( handle , opt , param )
-# Skipping MacroDefinition: curl_easy_getinfo ( handle , info , arg ) curl_easy_getinfo ( handle , info , arg )
-# Skipping MacroDefinition: curl_share_setopt ( share , opt , param ) curl_share_setopt ( share , opt , param )
-# Skipping MacroDefinition: curl_multi_setopt ( handle , opt , param ) curl_multi_setopt ( handle , opt , param )
-
 const CURLE_OBSOLETE16 = CURLE_HTTP2
 const CURLE_OBSOLETE10 = CURLE_FTP_ACCEPT_FAILED
 const CURLE_OBSOLETE12 = CURLE_FTP_ACCEPT_TIMEOUT
@@ -1206,9 +1177,6 @@ const CURL_CSELECT_ERR = 0x04
 
 const curl_socket_callback = Ptr{Cvoid}
 const curl_multi_timer_callback = Ptr{Cvoid}
-
-# Skipping MacroDefinition: curl_multi_socket ( x , y , z ) curl_multi_socket_action ( x , y , 0 , z )
-# Skipping MacroDefinition: CINIT ( name , type , num ) CURLMOPT_ ## name = CURLOPTTYPE_ ## type + num
 
 # begin enum CURLMoption
 const CURLMoption = UInt32

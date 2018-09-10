@@ -126,6 +126,10 @@ function curl_share_init()
     ccall((:curl_share_init, libcurl), Ptr{CURLSH}, ())
 end
 
+function curl_share_setopt(handle, opt, param)
+    ccall((:curl_share_setopt, libcurl), CURLSHcode, (Ptr{CURLSH}, CURLSHoption, Any), handle, opt, param)
+end
+
 function curl_share_cleanup(arg1)
     ccall((:curl_share_cleanup, libcurl), CURLSHcode, (Ptr{CURLSH},), arg1)
 end
@@ -150,12 +154,20 @@ function curl_easy_init()
     ccall((:curl_easy_init, libcurl), Ptr{CURL}, ())
 end
 
+function curl_easy_setopt(handle, opt, param)
+    ccall((:curl_easy_setopt, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Any), handle, opt, param)
+end
+
 function curl_easy_perform(curl)
     ccall((:curl_easy_perform, libcurl), CURLcode, (Ptr{CURL},), curl)
 end
 
 function curl_easy_cleanup(curl)
     ccall((:curl_easy_cleanup, libcurl), Cvoid, (Ptr{CURL},), curl)
+end
+
+function curl_easy_getinfo(handle, info, arg)
+    ccall((:curl_easy_getinfo, libcurl), CURLcode, (Ptr{CURL}, CURLINFO, Any), handle, info, arg)
 end
 
 function curl_easy_duphandle(curl)
@@ -224,6 +236,10 @@ end
 
 function curl_multi_timeout(multi_handle, milliseconds)
     ccall((:curl_multi_timeout, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{Clong}), multi_handle, milliseconds)
+end
+
+function curl_multi_setopt(multi_handle, opt, param)
+    ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Any), multi_handle, opt, param)
 end
 
 function curl_multi_assign(multi_handle, sockfd, sockp)
