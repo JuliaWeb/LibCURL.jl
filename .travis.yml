@@ -19,4 +19,3 @@ after_success:
       VERSION >= v"0.7.0-DEV.5183" || cd(Pkg.dir("LibCURL"))
       Pkg.add("Coverage"); using Coverage
       Codecov.submit(process_folder())'
-
