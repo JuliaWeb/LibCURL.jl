@@ -10,7 +10,7 @@ products = [
 # Install BinaryBuilder dependencies
 dependencies = [
     "https://github.com/bicycle1885/ZlibBuilder/releases/download/v1.0.2/build_Zlib.v1.2.11.jl",
-    "https://github.com/JuliaWeb/MbedTLSBuilder/releases/download/v0.11/build_MbedTLS.v1.0.0.jl"
+    "https://github.com/JuliaWeb/MbedTLSBuilder/releases/download/v0.16.0/build_MbedTLS.v2.13.1.jl"
 ]
 
 for url in dependencies
