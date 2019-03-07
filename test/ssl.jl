@@ -1,3 +1,5 @@
+using Compat
+
 # Test that https://www.google.com successfully connects
 curl = curl_easy_init()
 curl == C_NULL && error("curl_easy_init() failed")
