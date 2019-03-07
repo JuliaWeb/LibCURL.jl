@@ -34,9 +34,12 @@ end
 
     @testset "Success: find_system_cert" begin
         cacert = find_system_cacert()
-        enable_cacert(curl, cacert)
-        res = curl_easy_perform(curl)
-        @test res == CURLE_OK
+        # There is no guarantee that it will find a system cert
+        if cacert !== nothing
+            enable_cacert(curl, cacert)
+            res = curl_easy_perform(curl)
+            @test res == CURLE_OK
+        end
     end
 end
 
