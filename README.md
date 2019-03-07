@@ -31,10 +31,10 @@ curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1)
 function curl_write_cb(curlbuf::Ptr{Void}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
     sz = s * n
     data = Array{UInt8}(sz)
-    
+
     ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), data, curlbuf, sz)
     println("recd: ", String(data))
-    
+
     sz::Csize_t
 end
 
@@ -54,4 +54,31 @@ println("httpcode : ", http_code)
 # release handle
 curl_easy_cleanup(curl)
 
+```
+
+### Using CACerts for SSL/TLS Authentication
+
+If you want LibCURL to attempt to find a system CACert you can run:
+
+```julia
+# find_system_cert will return either a CACertFile or a CACertPath depending on
+# what kind of system certificate(s) it finds.
+# This function will return nothing if it can't find any system certificates
+cacert = find_system_cacert()
+
+if cacert !== nothing
+    enable_cacert(curl, cacert)
+end
+```
+
+You can also specify your own cacert if need be.
+
+```julia
+# You can either specify a specific certificate file
+cacert = CACertFile("path/to/cert.pem")
+enable_cacert(curl, cacert)
+
+# Or you can specify a folder that contains certificates
+cacert = CACertPath("path/to/certs")
+enable_cacert(curl, cacert)
 ```
