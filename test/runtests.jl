@@ -2,42 +2,54 @@ using LibCURL
 using Compat.Test
 
 # Just testing loading of the library and a simple library call.
-curl = curl_easy_init()
-curl == C_NULL && error("curl_easy_init() failed")
 
-@testset "test escape" begin
-    function testescape(s, esc_s)
-        b_arr = curl_easy_escape(curl, s, sizeof(s))
-        unsafe_string(b_arr) != esc_s && error("escaping $s failed")
-        curl_free(b_arr)
-    end
+@testset "LibCURL" begin
+    @testset "test escape" begin
+        curl = curl_easy_init()
+        curl == C_NULL && error("curl_easy_init() failed")
 
-    testescape("hello world", "hello%20world")
-    testescape("hello %world", "hello%20%25world")
-    testescape("hello%world", "hello%25world")
-end
-
-@testset "download" begin
-    url = "https://github.com/JuliaWeb/LibCURL.jl/blob/master/README.md"
-    filename = joinpath(@__DIR__, "README.md")
-
-    @testset "julia download" begin
-        try
-            download(url, filename)
-            @test isfile(filename)
-        finally
-            rm(filename; force=true)
+        function testescape(s, esc_s)
+            b_arr = curl_easy_escape(curl, s, sizeof(s))
+            us = unsafe_string(b_arr)
+            us != esc_s && error("escaping $s failed")
+            curl_free(b_arr)
+            @test us == esc_s
         end
+
+        testescape("hello world", "hello%20world")
+        testescape("hello %world", "hello%20%25world")
+        testescape("hello%world", "hello%25world")
+
+        curl_easy_cleanup(curl)
     end
 
-    @testset "system curl" begin
-        try
-            run(`curl -g -L -f -o $filename $url`)
-            @test isfile(filename)
-        finally
-            rm(filename; force=true)
+    @testset "download" begin
+        curl = curl_easy_init()
+        curl == C_NULL && error("curl_easy_init() failed")
+
+        url = "https://github.com/JuliaWeb/LibCURL.jl/blob/master/README.md"
+        filename = joinpath(@__DIR__, "README.md")
+
+        @testset "julia download" begin
+            try
+                download(url, filename)
+                @test isfile(filename)
+            finally
+                rm(filename; force=true)
+            end
         end
-    end
-end
 
-curl_easy_cleanup(curl)
+        @testset "system curl" begin
+            try
+                run(`curl -g -L -f -o $filename $url`)
+                @test isfile(filename)
+            finally
+                rm(filename; force=true)
+            end
+        end
+
+        curl_easy_cleanup(curl)
+    end
+
+    include("ssl.jl")
+end
