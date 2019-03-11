@@ -1,4 +1,5 @@
 using Compat
+using Compat.Sys: isapple, iswindows
 
 # Test that https://www.google.com successfully connects
 curl = curl_easy_init()
@@ -35,7 +36,7 @@ end
         # NOTE: This will fail on macOS due to the cross compilation not knowing where the
         # macOS CACerts would be
         # The same issue would exist with Windows as well
-        if Sys.isapple() || Sys.windows()
+        if isapple() || iswindows()
             @test_broken res == CURLE_OK
         else
             @test res == CURLE_OK
