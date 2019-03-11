@@ -15,7 +15,7 @@ function curl_write_cb(curlbuf::Ptr{Cvoid}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{
     sz::Csize_t
 end
 
-@testset "SSL: https://www.google.com" begin
+@testset "SSL verify" begin
     # Set up the write function to consume the curl output so we don't see it in the
     # test output
     c_curl_write_cb = @cfunction(
