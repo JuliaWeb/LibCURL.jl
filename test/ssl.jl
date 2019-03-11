@@ -35,7 +35,11 @@ end
         # NOTE: This will fail on macOS due to the cross compilation not knowing where the
         # macOS CACerts would be
         # The same issue would exist with Windows as well
-        @test res == CURLE_OK
+        if Sys.isapple() || Sys.windows()
+            @test_broken res == CURLE_OK
+        else
+            @test res == CURLE_OK
+        end
     end
 
 end
