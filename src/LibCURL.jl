@@ -2,8 +2,6 @@ VERSION < v"0.7.0-beta2.199" && __precompile__()
 
 module LibCURL
 
-import Compat: Sys, Cvoid
-
 const time_t = Int
 const size_t = Csize_t
 const curl_off_t = Int64

@@ -1,5 +1,5 @@
 using LibCURL
-using Compat.Test
+using Test
 
 # Just testing loading of the library and a simple library call.
 
