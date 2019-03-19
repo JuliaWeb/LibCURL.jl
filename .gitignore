@@ -33,4 +33,4 @@
 *.kate-swp
 
 /usr
-
+/Manifest.toml
