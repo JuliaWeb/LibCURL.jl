@@ -28,17 +28,17 @@ curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1)
 
 
 # setup the callback function to recv data
-function curl_write_cb(curlbuf::Ptr{Void}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Void})
+function curl_write_cb(curlbuf::Ptr{Cvoid}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Cvoid})
     sz = s * n
     data = Array{UInt8}(sz)
     
-    ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), data, curlbuf, sz)
+    ccall(:memcpy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, UInt64), data, curlbuf, sz)
     println("recd: ", String(data))
     
     sz::Csize_t
 end
 
-c_curl_write_cb = cfunction(curl_write_cb, Csize_t, (Ptr{Void}, Csize_t, Csize_t, Ptr{Void}))
+c_curl_write_cb = cfunction(curl_write_cb, Csize_t, (Ptr{Cvoid}, Csize_t, Csize_t, Ptr{Cvoid}))
 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, c_curl_write_cb)
 
 
@@ -47,7 +47,7 @@ res = curl_easy_perform(curl)
 println("curl url exec response : ", res)
 
 # retrieve HTTP code
-http_code = Array{Clong}(1)
+http_code = Array{Clong}(undef, 1)
 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, http_code)
 println("httpcode : ", http_code)
 
