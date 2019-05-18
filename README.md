@@ -4,6 +4,7 @@ LibCURL.jl
 *Julia wrapper for libCURL*
 
 [![Build Status](https://travis-ci.org/JuliaWeb/LibCURL.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/LibCURL.jl)
+[![Cirrus](https://api.cirrus-ci.com/github/JuliaWeb/LibCURL.jl.svg)](https://cirrus-ci.com/github/JuliaWeb/LibCURL.jl)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/github/JuliaWeb/LibCurl.jl?svg=true)](https://ci.appveyor.com/project/shashi/libcurl-jl)
 [![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
 
