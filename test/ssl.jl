@@ -32,8 +32,8 @@ end
         res = curl_easy_perform(curl)
         # NOTE: This will fail on macOS due to the cross compilation not knowing where the
         # macOS CACerts would be
-        # The same issue would exist with Windows as well
-        if Sys.isapple() || Sys.iswindows()
+        # The same issue would exist with Windows and FreeBSD as well
+        if Sys.isbsd() || Sys.iswindows()
             @test_broken res == CURLE_OK
         else
             @test res == CURLE_OK
