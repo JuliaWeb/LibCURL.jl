@@ -8,10 +8,6 @@ LibCURL.jl
 [![Appveyor](https://ci.appveyor.com/api/projects/status/github/JuliaWeb/LibCurl.jl?svg=true)](https://ci.appveyor.com/project/shashi/libcurl-jl)
 [![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
 
-[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.4.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.4)
-[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.5.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.5)
-[![LibCURL](http://pkg.julialang.org/badges/LibCURL_0.6.svg)](http://pkg.julialang.org/?pkg=LibCURL&ver=0.6)
-
 ---
 This is a simple Julia wrapper around http://curl.haxx.se/libcurl/ generated using [Clang.jl](https://github.com/ihnorton/Clang.jl).
 
