@@ -13,7 +13,10 @@ dependencies = [
 
 for dependency in dependencies
     file = joinpath(@__DIR__, basename(dependency))
-    isfile(file) || download(dependency, file)
+
+    # Use the BinaryProvider download function as it supports proxies.
+    # See: https://github.com/JuliaWeb/LibCURL.jl/issues/69
+    isfile(file) || BinaryProvider.download(dependency, file)
 
     # Build the dependencies
     # Note: It is a bit faster to run the build in an anonymous module instead of starting a new
