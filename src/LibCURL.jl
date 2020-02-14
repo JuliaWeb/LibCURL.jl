@@ -1,23 +1,14 @@
 
 module LibCURL
 
+using LibCURL_jll
+
 const time_t = Int
 const size_t = Csize_t
 const curl_off_t = Int64
 const fd_set = Union{}
 const socklen_t = Int32
 
-
-# Load libcurl libraries from our deps.jl
-const depsjl_path = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
-if !isfile(depsjl_path)
-    error("LibCURL not installed properly, run Pkg.build(\"LibCURL\"), restart Julia and try again")
-end
-include(depsjl_path)
-
-function __init__()
-    check_deps()  # Always check your dependencies from `deps.jl`
-end
 
 include("lC_exports_h.jl")
 include("lC_common_h.jl")
