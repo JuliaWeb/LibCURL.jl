@@ -9,6 +9,7 @@ const curl_off_t = Int64
 const fd_set = Union{}
 const socklen_t = Int32
 
+export Mime_ext
 
 include("lC_exports_h.jl")
 include("lC_common_h.jl")
@@ -30,6 +31,5 @@ curl_easy_getinfo(handle, opt, ptrval::AbstractString) = ccall((:curl_easy_getin
 include("lC_defines_h.jl")
 
 include("Mime_ext.jl")
-export Mime_ext
 
 end
