@@ -27,17 +27,11 @@ end
     curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1)
+    curl_easy_setopt(curl, CURLOPT_CAINFO, LibCURL.cacert)
 
     @testset "SSL Success" begin
         res = curl_easy_perform(curl)
-        # NOTE: This will fail on macOS due to the cross compilation not knowing where the
-        # macOS CACerts would be
-        # The same issue would exist with Windows and FreeBSD as well
-        if Sys.isbsd() || Sys.iswindows()
-            @test_broken res == CURLE_OK
-        else
-            @test res == CURLE_OK
-        end
+        @test res == CURLE_OK
     end
 
 end
