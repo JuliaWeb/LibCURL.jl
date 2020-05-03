@@ -9,7 +9,7 @@ LibCURL.jl
 [![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
 
 ---
-This is a simple Julia wrapper around http://curl.haxx.se/libcurl/ generated using [Clang.jl](https://github.com/ihnorton/Clang.jl).
+This is a simple Julia wrapper around http://curl.haxx.se/libcurl/ generated using [Clang.jl](https://github.com/ihnorton/Clang.jl). Please see the [libcurl api documentation](https://curl.haxx.se/libcurl/c/) for help on how to use this package. 
 
 ### Example (fetch a URL)
 
@@ -52,3 +52,19 @@ println("httpcode : ", http_code)
 curl_easy_cleanup(curl)
 
 ```
+
+### Binaries
+
+This package uses the [LibCURL_jll](https://github.com/JuliaBinaryWrappers/libCURL_jll.jl) binary package to install compiled libCURL binaries on all supported platforms. The following products are defined in the jll
+
+* `libcurl`: A `LibraryProduct` referencing the shared library
+* `curl`: An `ExecutableProduct` referencing the binary
+* `cacert`: A `FileProduct` referencing the Mozilla CA certificate bundle
+
+### SSL certificates
+
+Making SSL/TLS connections usually needs access to a CA certificate to validate peers. The Mozilla CA bundle can be used via this library. To utilise this certificate bundle, set the following option:
+ 
+`curl_easy_setopt(curl, CURLOPT_CAINFO, LibCURL.cacert)`
+
+
