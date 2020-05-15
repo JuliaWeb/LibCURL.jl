@@ -59,11 +59,14 @@ This package uses the [LibCURL_jll](https://github.com/JuliaBinaryWrappers/libCU
 
 * `libcurl`: A `LibraryProduct` referencing the shared library
 * `curl`: An `ExecutableProduct` referencing the binary
+
+This package also uses the [MozillaCACerts_jll](https://github.com/JuliaBinaryWrappers/MozillaCACerts_jll.jl) package to supply the Mozilla CA root certificate bundle. Note that the `cacert` symbol is re-exported from this package for ease of use.
+
 * `cacert`: A `FileProduct` referencing the Mozilla CA certificate bundle
 
 ### SSL certificates
 
-Making SSL/TLS connections usually needs access to a CA certificate to validate peers. The Mozilla CA bundle can be used via this library. To utilise this certificate bundle, set the following option:
+Making SSL/TLS connections usually needs access to a CA certificate to validate peers. The Mozilla CA bundle can be used via this package. To use this certificate bundle, set the following option:
 
 ```julia
 curl_easy_setopt(curl, CURLOPT_CAINFO, LibCURL.cacert)
