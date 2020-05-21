@@ -9,9 +9,6 @@ julia:
   - nightly
 notifications:
   email: false
-# script:
-#   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#   - julia -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("LibCURL"); Pkg.test("LibCURL"; coverage=true)'
 after_success:
   - |
     julia -e '
