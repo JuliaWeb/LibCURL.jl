@@ -4,13 +4,11 @@ os:
   - osx
   - freebsd
 julia:
-  - 1.3
+  # - 1.0  # Latest LTS release (currently unsupported)
+  - 1    # Latest stable release
   - nightly
 notifications:
   email: false
-# script:
-#   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#   - julia -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("LibCURL"); Pkg.test("LibCURL"; coverage=true)'
 after_success:
   - |
     julia -e '
