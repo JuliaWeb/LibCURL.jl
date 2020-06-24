@@ -1,6 +1,6 @@
 name = "LibCURL"
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
-version = "0.6.0"
+version = "0.6.1"
 
 [deps]
 LibCURL_jll = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
