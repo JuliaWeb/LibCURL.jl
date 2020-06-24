@@ -10,9 +10,16 @@ const curl_off_t = Int64
 const fd_set = Union{}
 const socklen_t = Int32
 
-const cacert = MozillaCACerts_jll.cacert
+cacert = ""
 
 export Mime_ext
+
+function __init__()
+    # Note: `MozillaCACerts_jll.cacert` is filled by `__init__` which requires LibCURL's
+    # copy to also be filled in during initialization. Doing this ensures compatibility
+    # with building system images.
+    global cacert = MozillaCACerts_jll.cacert
+end
 
 include("lC_exports_h.jl")
 include("lC_common_h.jl")
