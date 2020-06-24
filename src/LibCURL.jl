@@ -16,7 +16,7 @@ export Mime_ext
 
 function __init__()
     # Note: `MozillaCACerts_jll.cacert` is filled by `__init__` which requires LibCURL's
-    # copy to also be filled in during initialization. Doing this ensures that compatibility
+    # copy to also be filled in during initialization. Doing this ensures compatibility
     # with building system images.
     global cacert = MozillaCACerts_jll.cacert
 end
