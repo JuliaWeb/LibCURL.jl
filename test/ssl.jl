@@ -6,10 +6,8 @@ curl == C_NULL && error("curl_easy_init() failed")
 function curl_write_cb(curlbuf::Ptr{Cvoid}, s::Csize_t, n::Csize_t, p_ctxt::Ptr{Cvoid})
     sz = s * n
     data = Array{UInt8}(undef, sz)
-
-    ccall(:memcpy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, UInt64), data, curlbuf, sz)
-
-    sz::Csize_t
+    ccall(:memcpy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Csize_t), data, curlbuf, sz)
+    return sz::Csize_t
 end
 
 @testset "SSL verify" begin
