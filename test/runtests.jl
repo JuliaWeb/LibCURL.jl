@@ -1,5 +1,6 @@
-using LibCURL
 using Test
+using LibCURL
+using Downloads: download
 
 # Just testing loading of the library and a simple library call.
 
