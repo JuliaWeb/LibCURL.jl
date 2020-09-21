@@ -41,7 +41,7 @@ using Test
 
         @testset "system curl" begin
             try
-                run(`curl -g -L -f -o $filename $url`)
+                run(`curl -s -g -L -f -o $filename $url`)
                 @test isfile(filename)
             finally
                 rm(filename; force=true)
