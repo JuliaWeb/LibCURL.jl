@@ -1,5 +1,6 @@
-using LibCURL
 using Test
+using LibCURL
+using Downloads: download
 
 # Just testing loading of the library and a simple library call.
 
@@ -41,7 +42,7 @@ using Test
 
         @testset "system curl" begin
             try
-                run(`curl -g -L -f -o $filename $url`)
+                run(`curl -s -S -g -L -f -o $filename $url`)
                 @test isfile(filename)
             finally
                 rm(filename; force=true)
