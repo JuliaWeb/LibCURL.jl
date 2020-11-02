@@ -29,7 +29,7 @@ using Downloads: download
         curl == C_NULL && error("curl_easy_init() failed")
 
         url = "https://github.com/JuliaWeb/LibCURL.jl/blob/master/README.md"
-        filename = joinpath(@__DIR__, "README.md")
+        filename = joinpath(mktempdir(), "README.md")
 
         @testset "julia download" begin
             try
