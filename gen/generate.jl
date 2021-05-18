@@ -6,7 +6,7 @@ using LibCURL_jll
 
 cd(@__DIR__)
 
-artifact_toml = joinpath(dirname(Pkg.pathof(LibCURL_jll)), "..", "StdlibArtifacts.toml")
+artifact_toml = joinpath(dirname(pathof(LibCURL_jll)), "..", "StdlibArtifacts.toml")
 artifact_dir = Pkg.Artifacts.ensure_artifact_installed("LibCURL", artifact_toml)
 
 include_dir = joinpath(artifact_dir, "include") |> normpath
