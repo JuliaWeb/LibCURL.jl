@@ -1,0 +1,14 @@
+[general]
+library_name = "libcurl"
+use_julia_native_enum_type = true
+use_deterministic_symbol = true
+auto_mutability = true
+
+printer_blacklist = [
+    "CURL_SUFFIX_CURL_OFF_T",
+    "CURL_SUFFIX_CURL_OFF_TU",
+    "CURL_ZERO_TERMINATED",
+]
+
+[codegen.macro]
+macro_mode = "basic"
