@@ -25,6 +25,8 @@ for target in JLLEnvs.JLL_ENV_TRIPLES
 
     args = get_default_args(target)
     push!(args, "-I$include_dir")
+    # Disable typecheck macros to generate variadic functions
+    push(args, "-D__STDC__=0", "-DCURL_DISABLE_TYPECHECK")
 
     # header_files = detect_headers(include_dir, args)
     header_files = [curl_h]

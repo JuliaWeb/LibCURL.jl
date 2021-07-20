@@ -1,3 +1,12 @@
+to_c_type(t::Type{Union{Bool, Int8, Int16, Int32, Int64, UInt8, UInt16, UInt32, UInt64, Float64, Complex{Float32}, Complex{Float64}}}) = t
+to_c_type(t::Type{<:Vector}) = Ptr{to_c_type(eltype(t))}
+to_c_type(::Type{String}) = Cstring
+to_c_type(::Type{<:Ref}) = Ptr{Cvoid}
+to_c_type(t) = t
+to_c_type_pairs(va_list) = map(enumerate(to_c_type.(va_list))) do (ind, type)
+    :(va_list[$ind]::$type)
+end
+
 const __time_t = Int64
 
 const __sa_family_t = UInt8
@@ -909,6 +918,11 @@ end
     CURL_FORMADD_LAST = 8
 end
 
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function curl_formadd(httppost, last_post, va_list...)
+        :(@ccall(libcurl.curl_formadd(httppost::Ptr{Ptr{curl_httppost}}, last_post::Ptr{Ptr{curl_httppost}}; $(to_c_type_pairs(va_list)...))::CURLFORMcode))
+    end
+
 # typedef size_t ( * curl_formget_callback ) ( void * arg , const char * buf , size_t len )
 const curl_formget_callback = Ptr{Cvoid}
 
@@ -1130,6 +1144,11 @@ function curl_share_init()
     ccall((:curl_share_init, libcurl), Ptr{CURLSH}, ())
 end
 
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function curl_share_setopt(arg1, option, va_list...)
+        :(@ccall(libcurl.curl_share_setopt(arg1::Ptr{CURLSH}, option::CURLSHoption; $(to_c_type_pairs(va_list)...))::CURLSHcode))
+    end
+
 function curl_share_cleanup(arg1)
     ccall((:curl_share_cleanup, libcurl), CURLSHcode, (Ptr{CURLSH},), arg1)
 end
@@ -1200,6 +1219,11 @@ function curl_easy_init()
     ccall((:curl_easy_init, libcurl), Ptr{CURL}, ())
 end
 
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function curl_easy_setopt(curl, option, va_list...)
+        :(@ccall(libcurl.curl_easy_setopt(curl::Ptr{CURL}, option::CURLoption; $(to_c_type_pairs(va_list)...))::CURLcode))
+    end
+
 function curl_easy_perform(curl)
     ccall((:curl_easy_perform, libcurl), CURLcode, (Ptr{CURL},), curl)
 end
@@ -1207,6 +1231,11 @@ end
 function curl_easy_cleanup(curl)
     ccall((:curl_easy_cleanup, libcurl), Cvoid, (Ptr{CURL},), curl)
 end
+
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function curl_easy_getinfo(curl, info, va_list...)
+        :(@ccall(libcurl.curl_easy_getinfo(curl::Ptr{CURL}, info::CURLINFO; $(to_c_type_pairs(va_list)...))::CURLcode))
+    end
 
 function curl_easy_duphandle(curl)
     ccall((:curl_easy_duphandle, libcurl), Ptr{CURL}, (Ptr{CURL},), curl)
@@ -1363,6 +1392,11 @@ end
     CURLMOPT_MAX_CONCURRENT_STREAMS = 16
     CURLMOPT_LASTENTRY = 17
 end
+
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function curl_multi_setopt(multi_handle, option, va_list...)
+        :(@ccall(libcurl.curl_multi_setopt(multi_handle::Ptr{CURLM}, option::CURLMoption; $(to_c_type_pairs(va_list)...))::CURLMcode))
+    end
 
 function curl_multi_assign(multi_handle, sockfd, sockp)
     ccall((:curl_multi_assign, libcurl), CURLMcode, (Ptr{CURLM}, curl_socket_t, Ptr{Cvoid}), multi_handle, sockfd, sockp)

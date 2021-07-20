@@ -48,24 +48,6 @@ else
     error("Unknown platform: $(Sys.MACHINE)")
 end
 
-# curl_share_setopt, curl_easy_getinfo, curl_easy_setopt, and curl_multi_setopt are vararg C functions
-curl_share_setopt(handle, opt, param) = ccall((:curl_share_setopt, libcurl), CURLSHcode, (Ptr{CURLSH}, CURLSHoption, Any...), handle, opt, param)
-
-curl_easy_setopt(handle, opt, ptrval::Array{T}) where T = ccall((:curl_easy_setopt, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{T}...), handle, opt, ptrval)
-curl_easy_setopt(handle, opt, ptrval::Integer) = ccall((:curl_easy_setopt, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Clong...), handle, opt, ptrval)
-curl_easy_setopt(handle, opt, ptrval::Ptr{T}) where {T} = ccall((:curl_easy_setopt, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{T}...), handle, opt, ptrval)
-curl_easy_setopt(handle, opt, ptrval::AbstractString) = ccall((:curl_easy_setopt, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{UInt8}...), handle, opt, ptrval)
-curl_easy_setopt(handle, opt, param) = ccall((:curl_easy_setopt, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Any...), handle, opt, param)
-
-curl_multi_setopt(handle, opt, ptrval::Array{T}) where T = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Ptr{T}...), handle, opt, ptrval)
-curl_multi_setopt(handle, opt, ptrval::Integer) = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Clong...), handle, opt, ptrval)
-curl_multi_setopt(handle, opt, ptrval::Ptr{T}) where {T} = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Ptr{T}...), handle, opt, ptrval)
-curl_multi_setopt(handle, opt, ptrval::AbstractString) = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Ptr{UInt8}...), handle, opt, ptrval)
-curl_multi_setopt(multi_handle, opt, param) = ccall((:curl_multi_setopt, libcurl), CURLMcode, (Ptr{CURLM}, CURLMoption, Any...), multi_handle, opt, param)
-
-curl_easy_getinfo(handle, opt, ptrval::Array{T}) where T = ccall((:curl_easy_getinfo, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{T}...), handle, opt, ptrval)
-curl_easy_getinfo(handle, opt, ptrval::AbstractString) = ccall((:curl_easy_getinfo, libcurl), CURLcode, (Ptr{CURL}, CURLoption, Ptr{UInt8}...), handle, opt, ptrval)
-curl_easy_getinfo(handle, info, arg) = ccall((:curl_easy_getinfo, libcurl), CURLcode, (Ptr{CURL}, CURLINFO, Any...), handle, info, arg)
 
 include("Mime_ext.jl")
 
