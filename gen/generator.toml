@@ -10,5 +10,9 @@ printer_blacklist = [
     "CURL_ZERO_TERMINATED",
 ]
 
+[codegen]
+use_ccall_macro = true
+wrap_variadic_function = true
+
 [codegen.macro]
 macro_mode = "basic"

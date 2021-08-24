@@ -14,6 +14,22 @@ function __init__()
     global cacert = MozillaCACerts_jll.cacert
 end
 
+# Shadow @enum to create enum as integer
+macro enum(decl::Expr, body::Expr)
+    @assert Meta.isexpr(decl, :(::))
+    enumname, basetype = decl.args
+    esc(body)
+    res = quote
+        const $enumname = $basetype
+    end
+    for ex in body.args
+        ex isa Expr || continue
+        @assert Meta.isexpr(ex, :(=))
+        push!(res.args, :(const $(ex.args[1]) = $(enumname)($(ex.args[2]))))
+    end
+    esc(res)
+end
+
 const IS_LIBC_MUSL = occursin("musl", Sys.MACHINE)
 
 if Sys.isapple() && Sys.ARCH === :aarch64
@@ -41,7 +57,7 @@ elseif Sys.islinux() && Sys.ARCH === :x86_64 && !IS_LIBC_MUSL
 elseif Sys.islinux() && Sys.ARCH === :x86_64 && IS_LIBC_MUSL
     include("../lib/x86_64-linux-musl.jl")
 elseif Sys.isbsd() && !Sys.isapple()
-    include("../lib/x86_64-unknown-freebsd11.1.jl")
+    include("../lib/x86_64-unknown-freebsd12.2.jl")
 elseif Sys.iswindows() && Sys.ARCH === :x86_64
     include("../lib/x86_64-w64-mingw32.jl")
 else

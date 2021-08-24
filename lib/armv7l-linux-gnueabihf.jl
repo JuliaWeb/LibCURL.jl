@@ -1,8 +1,4 @@
-to_c_type(t::Type{Union{Bool, Int8, Int16, Int32, Int64, UInt8, UInt16, UInt32, UInt64, Float64, Complex{Float32}, Complex{Float64}}}) = t
-to_c_type(t::Type{<:Vector}) = Ptr{to_c_type(eltype(t))}
-to_c_type(::Type{String}) = Cstring
-to_c_type(::Type{<:Ref}) = Ptr{Cvoid}
-to_c_type(t) = t
+to_c_type(t::Type) = t
 to_c_type_pairs(va_list) = map(enumerate(to_c_type.(va_list))) do (ind, type)
     :(va_list[$ind]::$type)
 end
@@ -65,8 +61,7 @@ struct curl_httppost
     buffer::Ptr{Cchar}
     bufferlength::Clong
     contenttype::Ptr{Cchar}
-    # contentheader::Ptr{curl_slist}
-    contentheader::Ptr{Cvoid}
+    contentheader::Ptr{Cvoid} # contentheader::Ptr{curl_slist}
     more::Ptr{curl_httppost}
     flags::Clong
     showfilename::Ptr{Cchar}
@@ -808,11 +803,11 @@ end
 end
 
 function curl_strequal(s1, s2)
-    ccall((:curl_strequal, libcurl), Cint, (Ptr{Cchar}, Ptr{Cchar}), s1, s2)
+    @ccall libcurl.curl_strequal(s1::Ptr{Cchar}, s2::Ptr{Cchar})::Cint
 end
 
 function curl_strnequal(s1, s2, n)
-    ccall((:curl_strnequal, libcurl), Cint, (Ptr{Cchar}, Ptr{Cchar}, Csize_t), s1, s2, n)
+    @ccall libcurl.curl_strnequal(s1::Ptr{Cchar}, s2::Ptr{Cchar}, n::Csize_t)::Cint
 end
 
 mutable struct curl_mime end
@@ -820,47 +815,47 @@ mutable struct curl_mime end
 mutable struct curl_mimepart end
 
 function curl_mime_init(easy)
-    ccall((:curl_mime_init, libcurl), Ptr{curl_mime}, (Ptr{CURL},), easy)
+    @ccall libcurl.curl_mime_init(easy::Ptr{CURL})::Ptr{curl_mime}
 end
 
 function curl_mime_free(mime)
-    ccall((:curl_mime_free, libcurl), Cvoid, (Ptr{curl_mime},), mime)
+    @ccall libcurl.curl_mime_free(mime::Ptr{curl_mime})::Cvoid
 end
 
 function curl_mime_addpart(mime)
-    ccall((:curl_mime_addpart, libcurl), Ptr{curl_mimepart}, (Ptr{curl_mime},), mime)
+    @ccall libcurl.curl_mime_addpart(mime::Ptr{curl_mime})::Ptr{curl_mimepart}
 end
 
 function curl_mime_name(part, name)
-    ccall((:curl_mime_name, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{Cchar}), part, name)
+    @ccall libcurl.curl_mime_name(part::Ptr{curl_mimepart}, name::Ptr{Cchar})::CURLcode
 end
 
 function curl_mime_filename(part, filename)
-    ccall((:curl_mime_filename, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{Cchar}), part, filename)
+    @ccall libcurl.curl_mime_filename(part::Ptr{curl_mimepart}, filename::Ptr{Cchar})::CURLcode
 end
 
 function curl_mime_type(part, mimetype)
-    ccall((:curl_mime_type, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{Cchar}), part, mimetype)
+    @ccall libcurl.curl_mime_type(part::Ptr{curl_mimepart}, mimetype::Ptr{Cchar})::CURLcode
 end
 
 function curl_mime_encoder(part, encoding)
-    ccall((:curl_mime_encoder, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{Cchar}), part, encoding)
+    @ccall libcurl.curl_mime_encoder(part::Ptr{curl_mimepart}, encoding::Ptr{Cchar})::CURLcode
 end
 
 function curl_mime_data(part, data, datasize)
-    ccall((:curl_mime_data, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{Cchar}, Csize_t), part, data, datasize)
+    @ccall libcurl.curl_mime_data(part::Ptr{curl_mimepart}, data::Ptr{Cchar}, datasize::Csize_t)::CURLcode
 end
 
 function curl_mime_filedata(part, filename)
-    ccall((:curl_mime_filedata, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{Cchar}), part, filename)
+    @ccall libcurl.curl_mime_filedata(part::Ptr{curl_mimepart}, filename::Ptr{Cchar})::CURLcode
 end
 
 function curl_mime_data_cb(part, datasize, readfunc, seekfunc, freefunc, arg)
-    ccall((:curl_mime_data_cb, libcurl), CURLcode, (Ptr{curl_mimepart}, curl_off_t, curl_read_callback, curl_seek_callback, curl_free_callback, Ptr{Cvoid}), part, datasize, readfunc, seekfunc, freefunc, arg)
+    @ccall libcurl.curl_mime_data_cb(part::Ptr{curl_mimepart}, datasize::curl_off_t, readfunc::curl_read_callback, seekfunc::curl_seek_callback, freefunc::curl_free_callback, arg::Ptr{Cvoid})::CURLcode
 end
 
 function curl_mime_subparts(part, subparts)
-    ccall((:curl_mime_subparts, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{curl_mime}), part, subparts)
+    @ccall libcurl.curl_mime_subparts(part::Ptr{curl_mimepart}, subparts::Ptr{curl_mime})::CURLcode
 end
 
 struct curl_slist
@@ -869,7 +864,7 @@ struct curl_slist
 end
 
 function curl_mime_headers(part, headers, take_ownership)
-    ccall((:curl_mime_headers, libcurl), CURLcode, (Ptr{curl_mimepart}, Ptr{curl_slist}, Cint), part, headers, take_ownership)
+    @ccall libcurl.curl_mime_headers(part::Ptr{curl_mimepart}, headers::Ptr{curl_slist}, take_ownership::Cint)::CURLcode
 end
 
 @enum CURLformoption::UInt32 begin
@@ -924,51 +919,51 @@ end
 const curl_formget_callback = Ptr{Cvoid}
 
 function curl_formget(form, arg, append)
-    ccall((:curl_formget, libcurl), Cint, (Ptr{curl_httppost}, Ptr{Cvoid}, curl_formget_callback), form, arg, append)
+    @ccall libcurl.curl_formget(form::Ptr{curl_httppost}, arg::Ptr{Cvoid}, append::curl_formget_callback)::Cint
 end
 
 function curl_formfree(form)
-    ccall((:curl_formfree, libcurl), Cvoid, (Ptr{curl_httppost},), form)
+    @ccall libcurl.curl_formfree(form::Ptr{curl_httppost})::Cvoid
 end
 
 function curl_getenv(variable)
-    ccall((:curl_getenv, libcurl), Ptr{Cchar}, (Ptr{Cchar},), variable)
+    @ccall libcurl.curl_getenv(variable::Ptr{Cchar})::Ptr{Cchar}
 end
 
 function curl_version()
-    ccall((:curl_version, libcurl), Ptr{Cchar}, ())
+    @ccall libcurl.curl_version()::Ptr{Cchar}
 end
 
 function curl_easy_escape(handle, string, length)
-    ccall((:curl_easy_escape, libcurl), Ptr{Cchar}, (Ptr{CURL}, Ptr{Cchar}, Cint), handle, string, length)
+    @ccall libcurl.curl_easy_escape(handle::Ptr{CURL}, string::Ptr{Cchar}, length::Cint)::Ptr{Cchar}
 end
 
 function curl_escape(string, length)
-    ccall((:curl_escape, libcurl), Ptr{Cchar}, (Ptr{Cchar}, Cint), string, length)
+    @ccall libcurl.curl_escape(string::Ptr{Cchar}, length::Cint)::Ptr{Cchar}
 end
 
 function curl_easy_unescape(handle, string, length, outlength)
-    ccall((:curl_easy_unescape, libcurl), Ptr{Cchar}, (Ptr{CURL}, Ptr{Cchar}, Cint, Ptr{Cint}), handle, string, length, outlength)
+    @ccall libcurl.curl_easy_unescape(handle::Ptr{CURL}, string::Ptr{Cchar}, length::Cint, outlength::Ptr{Cint})::Ptr{Cchar}
 end
 
 function curl_unescape(string, length)
-    ccall((:curl_unescape, libcurl), Ptr{Cchar}, (Ptr{Cchar}, Cint), string, length)
+    @ccall libcurl.curl_unescape(string::Ptr{Cchar}, length::Cint)::Ptr{Cchar}
 end
 
 function curl_free(p)
-    ccall((:curl_free, libcurl), Cvoid, (Ptr{Cvoid},), p)
+    @ccall libcurl.curl_free(p::Ptr{Cvoid})::Cvoid
 end
 
 function curl_global_init(flags)
-    ccall((:curl_global_init, libcurl), CURLcode, (Clong,), flags)
+    @ccall libcurl.curl_global_init(flags::Clong)::CURLcode
 end
 
 function curl_global_init_mem(flags, m, f, r, s, c)
-    ccall((:curl_global_init_mem, libcurl), CURLcode, (Clong, curl_malloc_callback, curl_free_callback, curl_realloc_callback, curl_strdup_callback, curl_calloc_callback), flags, m, f, r, s, c)
+    @ccall libcurl.curl_global_init_mem(flags::Clong, m::curl_malloc_callback, f::curl_free_callback, r::curl_realloc_callback, s::curl_strdup_callback, c::curl_calloc_callback)::CURLcode
 end
 
 function curl_global_cleanup()
-    ccall((:curl_global_cleanup, libcurl), Cvoid, ())
+    @ccall libcurl.curl_global_cleanup()::Cvoid
 end
 
 mutable struct curl_ssl_backend
@@ -985,19 +980,19 @@ end
 end
 
 function curl_global_sslset(id, name, avail)
-    ccall((:curl_global_sslset, libcurl), CURLsslset, (curl_sslbackend, Ptr{Cchar}, Ptr{Ptr{Ptr{curl_ssl_backend}}}), id, name, avail)
+    @ccall libcurl.curl_global_sslset(id::curl_sslbackend, name::Ptr{Cchar}, avail::Ptr{Ptr{Ptr{curl_ssl_backend}}})::CURLsslset
 end
 
 function curl_slist_append(arg1, arg2)
-    ccall((:curl_slist_append, libcurl), Ptr{curl_slist}, (Ptr{curl_slist}, Ptr{Cchar}), arg1, arg2)
+    @ccall libcurl.curl_slist_append(arg1::Ptr{curl_slist}, arg2::Ptr{Cchar})::Ptr{curl_slist}
 end
 
 function curl_slist_free_all(arg1)
-    ccall((:curl_slist_free_all, libcurl), Cvoid, (Ptr{curl_slist},), arg1)
+    @ccall libcurl.curl_slist_free_all(arg1::Ptr{curl_slist})::Cvoid
 end
 
 function curl_getdate(p, unused)
-    ccall((:curl_getdate, libcurl), time_t, (Ptr{Cchar}, Ptr{time_t}), p, unused)
+    @ccall libcurl.curl_getdate(p::Ptr{Cchar}, unused::Ptr{time_t})::time_t
 end
 
 mutable struct curl_certinfo
@@ -1138,7 +1133,7 @@ end
 end
 
 function curl_share_init()
-    ccall((:curl_share_init, libcurl), Ptr{CURLSH}, ())
+    @ccall libcurl.curl_share_init()::Ptr{CURLSH}
 end
 
 # automatic type deduction for variadic arguments may not be what you want, please use with caution
@@ -1147,7 +1142,7 @@ end
     end
 
 function curl_share_cleanup(arg1)
-    ccall((:curl_share_cleanup, libcurl), CURLSHcode, (Ptr{CURLSH},), arg1)
+    @ccall libcurl.curl_share_cleanup(arg1::Ptr{CURLSH})::CURLSHcode
 end
 
 @enum CURLversion::UInt32 begin
@@ -1190,19 +1185,19 @@ mutable struct curl_version_info_data
 end
 
 function curl_version_info(arg1)
-    ccall((:curl_version_info, libcurl), Ptr{curl_version_info_data}, (CURLversion,), arg1)
+    @ccall libcurl.curl_version_info(arg1::CURLversion)::Ptr{curl_version_info_data}
 end
 
 function curl_easy_strerror(arg1)
-    ccall((:curl_easy_strerror, libcurl), Ptr{Cchar}, (CURLcode,), arg1)
+    @ccall libcurl.curl_easy_strerror(arg1::CURLcode)::Ptr{Cchar}
 end
 
 function curl_share_strerror(arg1)
-    ccall((:curl_share_strerror, libcurl), Ptr{Cchar}, (CURLSHcode,), arg1)
+    @ccall libcurl.curl_share_strerror(arg1::CURLSHcode)::Ptr{Cchar}
 end
 
 function curl_easy_pause(handle, bitmask)
-    ccall((:curl_easy_pause, libcurl), CURLcode, (Ptr{CURL}, Cint), handle, bitmask)
+    @ccall libcurl.curl_easy_pause(handle::Ptr{CURL}, bitmask::Cint)::CURLcode
 end
 
 mutable struct curl_blob
@@ -1213,7 +1208,7 @@ mutable struct curl_blob
 end
 
 function curl_easy_init()
-    ccall((:curl_easy_init, libcurl), Ptr{CURL}, ())
+    @ccall libcurl.curl_easy_init()::Ptr{CURL}
 end
 
 # automatic type deduction for variadic arguments may not be what you want, please use with caution
@@ -1222,11 +1217,11 @@ end
     end
 
 function curl_easy_perform(curl)
-    ccall((:curl_easy_perform, libcurl), CURLcode, (Ptr{CURL},), curl)
+    @ccall libcurl.curl_easy_perform(curl::Ptr{CURL})::CURLcode
 end
 
 function curl_easy_cleanup(curl)
-    ccall((:curl_easy_cleanup, libcurl), Cvoid, (Ptr{CURL},), curl)
+    @ccall libcurl.curl_easy_cleanup(curl::Ptr{CURL})::Cvoid
 end
 
 # automatic type deduction for variadic arguments may not be what you want, please use with caution
@@ -1235,23 +1230,23 @@ end
     end
 
 function curl_easy_duphandle(curl)
-    ccall((:curl_easy_duphandle, libcurl), Ptr{CURL}, (Ptr{CURL},), curl)
+    @ccall libcurl.curl_easy_duphandle(curl::Ptr{CURL})::Ptr{CURL}
 end
 
 function curl_easy_reset(curl)
-    ccall((:curl_easy_reset, libcurl), Cvoid, (Ptr{CURL},), curl)
+    @ccall libcurl.curl_easy_reset(curl::Ptr{CURL})::Cvoid
 end
 
 function curl_easy_recv(curl, buffer, buflen, n)
-    ccall((:curl_easy_recv, libcurl), CURLcode, (Ptr{CURL}, Ptr{Cvoid}, Csize_t, Ptr{Csize_t}), curl, buffer, buflen, n)
+    @ccall libcurl.curl_easy_recv(curl::Ptr{CURL}, buffer::Ptr{Cvoid}, buflen::Csize_t, n::Ptr{Csize_t})::CURLcode
 end
 
 function curl_easy_send(curl, buffer, buflen, n)
-    ccall((:curl_easy_send, libcurl), CURLcode, (Ptr{CURL}, Ptr{Cvoid}, Csize_t, Ptr{Csize_t}), curl, buffer, buflen, n)
+    @ccall libcurl.curl_easy_send(curl::Ptr{CURL}, buffer::Ptr{Cvoid}, buflen::Csize_t, n::Ptr{Csize_t})::CURLcode
 end
 
 function curl_easy_upkeep(curl)
-    ccall((:curl_easy_upkeep, libcurl), CURLcode, (Ptr{CURL},), curl)
+    @ccall libcurl.curl_easy_upkeep(curl::Ptr{CURL})::CURLcode
 end
 
 const CURLM = Cvoid
@@ -1308,47 +1303,47 @@ mutable struct curl_waitfd
 end
 
 function curl_multi_init()
-    ccall((:curl_multi_init, libcurl), Ptr{CURLM}, ())
+    @ccall libcurl.curl_multi_init()::Ptr{CURLM}
 end
 
 function curl_multi_add_handle(multi_handle, curl_handle)
-    ccall((:curl_multi_add_handle, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{CURL}), multi_handle, curl_handle)
+    @ccall libcurl.curl_multi_add_handle(multi_handle::Ptr{CURLM}, curl_handle::Ptr{CURL})::CURLMcode
 end
 
 function curl_multi_remove_handle(multi_handle, curl_handle)
-    ccall((:curl_multi_remove_handle, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{CURL}), multi_handle, curl_handle)
+    @ccall libcurl.curl_multi_remove_handle(multi_handle::Ptr{CURLM}, curl_handle::Ptr{CURL})::CURLMcode
 end
 
 function curl_multi_fdset(multi_handle, read_fd_set, write_fd_set, exc_fd_set, max_fd)
-    ccall((:curl_multi_fdset, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{fd_set}, Ptr{fd_set}, Ptr{fd_set}, Ptr{Cint}), multi_handle, read_fd_set, write_fd_set, exc_fd_set, max_fd)
+    @ccall libcurl.curl_multi_fdset(multi_handle::Ptr{CURLM}, read_fd_set::Ptr{fd_set}, write_fd_set::Ptr{fd_set}, exc_fd_set::Ptr{fd_set}, max_fd::Ptr{Cint})::CURLMcode
 end
 
 function curl_multi_wait(multi_handle, extra_fds, extra_nfds, timeout_ms, ret)
-    ccall((:curl_multi_wait, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{curl_waitfd}, Cuint, Cint, Ptr{Cint}), multi_handle, extra_fds, extra_nfds, timeout_ms, ret)
+    @ccall libcurl.curl_multi_wait(multi_handle::Ptr{CURLM}, extra_fds::Ptr{curl_waitfd}, extra_nfds::Cuint, timeout_ms::Cint, ret::Ptr{Cint})::CURLMcode
 end
 
 function curl_multi_poll(multi_handle, extra_fds, extra_nfds, timeout_ms, ret)
-    ccall((:curl_multi_poll, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{curl_waitfd}, Cuint, Cint, Ptr{Cint}), multi_handle, extra_fds, extra_nfds, timeout_ms, ret)
+    @ccall libcurl.curl_multi_poll(multi_handle::Ptr{CURLM}, extra_fds::Ptr{curl_waitfd}, extra_nfds::Cuint, timeout_ms::Cint, ret::Ptr{Cint})::CURLMcode
 end
 
 function curl_multi_wakeup(multi_handle)
-    ccall((:curl_multi_wakeup, libcurl), CURLMcode, (Ptr{CURLM},), multi_handle)
+    @ccall libcurl.curl_multi_wakeup(multi_handle::Ptr{CURLM})::CURLMcode
 end
 
 function curl_multi_perform(multi_handle, running_handles)
-    ccall((:curl_multi_perform, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{Cint}), multi_handle, running_handles)
+    @ccall libcurl.curl_multi_perform(multi_handle::Ptr{CURLM}, running_handles::Ptr{Cint})::CURLMcode
 end
 
 function curl_multi_cleanup(multi_handle)
-    ccall((:curl_multi_cleanup, libcurl), CURLMcode, (Ptr{CURLM},), multi_handle)
+    @ccall libcurl.curl_multi_cleanup(multi_handle::Ptr{CURLM})::CURLMcode
 end
 
 function curl_multi_info_read(multi_handle, msgs_in_queue)
-    ccall((:curl_multi_info_read, libcurl), Ptr{CURLMsg}, (Ptr{CURLM}, Ptr{Cint}), multi_handle, msgs_in_queue)
+    @ccall libcurl.curl_multi_info_read(multi_handle::Ptr{CURLM}, msgs_in_queue::Ptr{Cint})::Ptr{CURLMsg}
 end
 
 function curl_multi_strerror(arg1)
-    ccall((:curl_multi_strerror, libcurl), Ptr{Cchar}, (CURLMcode,), arg1)
+    @ccall libcurl.curl_multi_strerror(arg1::CURLMcode)::Ptr{Cchar}
 end
 
 # typedef int ( * curl_socket_callback ) ( CURL * easy , /* easy handle */ curl_socket_t s , /* socket */ int what , /* see above */ void * userp , /* private callback
@@ -1359,15 +1354,15 @@ const curl_socket_callback = Ptr{Cvoid}
 const curl_multi_timer_callback = Ptr{Cvoid}
 
 function curl_multi_socket_action(multi_handle, s, ev_bitmask, running_handles)
-    ccall((:curl_multi_socket_action, libcurl), CURLMcode, (Ptr{CURLM}, curl_socket_t, Cint, Ptr{Cint}), multi_handle, s, ev_bitmask, running_handles)
+    @ccall libcurl.curl_multi_socket_action(multi_handle::Ptr{CURLM}, s::curl_socket_t, ev_bitmask::Cint, running_handles::Ptr{Cint})::CURLMcode
 end
 
 function curl_multi_socket_all(multi_handle, running_handles)
-    ccall((:curl_multi_socket_all, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{Cint}), multi_handle, running_handles)
+    @ccall libcurl.curl_multi_socket_all(multi_handle::Ptr{CURLM}, running_handles::Ptr{Cint})::CURLMcode
 end
 
 function curl_multi_timeout(multi_handle, milliseconds)
-    ccall((:curl_multi_timeout, libcurl), CURLMcode, (Ptr{CURLM}, Ptr{Clong}), multi_handle, milliseconds)
+    @ccall libcurl.curl_multi_timeout(multi_handle::Ptr{CURLM}, milliseconds::Ptr{Clong})::CURLMcode
 end
 
 @enum CURLMoption::UInt32 begin
@@ -1396,17 +1391,17 @@ end
     end
 
 function curl_multi_assign(multi_handle, sockfd, sockp)
-    ccall((:curl_multi_assign, libcurl), CURLMcode, (Ptr{CURLM}, curl_socket_t, Ptr{Cvoid}), multi_handle, sockfd, sockp)
+    @ccall libcurl.curl_multi_assign(multi_handle::Ptr{CURLM}, sockfd::curl_socket_t, sockp::Ptr{Cvoid})::CURLMcode
 end
 
 mutable struct curl_pushheaders end
 
 function curl_pushheader_bynum(h, num)
-    ccall((:curl_pushheader_bynum, libcurl), Ptr{Cchar}, (Ptr{curl_pushheaders}, Csize_t), h, num)
+    @ccall libcurl.curl_pushheader_bynum(h::Ptr{curl_pushheaders}, num::Csize_t)::Ptr{Cchar}
 end
 
 function curl_pushheader_byname(h, name)
-    ccall((:curl_pushheader_byname, libcurl), Ptr{Cchar}, (Ptr{curl_pushheaders}, Ptr{Cchar}), h, name)
+    @ccall libcurl.curl_pushheader_byname(h::Ptr{curl_pushheaders}, name::Ptr{Cchar})::Ptr{Cchar}
 end
 
 # typedef int ( * curl_push_callback ) ( CURL * parent , CURL * easy , size_t num_headers , struct curl_pushheaders * headers , void * userp )
@@ -1452,23 +1447,23 @@ mutable struct Curl_URL end
 const CURLU = Curl_URL
 
 function curl_url()
-    ccall((:curl_url, libcurl), Ptr{CURLU}, ())
+    @ccall libcurl.curl_url()::Ptr{CURLU}
 end
 
 function curl_url_cleanup(handle)
-    ccall((:curl_url_cleanup, libcurl), Cvoid, (Ptr{CURLU},), handle)
+    @ccall libcurl.curl_url_cleanup(handle::Ptr{CURLU})::Cvoid
 end
 
 function curl_url_dup(in)
-    ccall((:curl_url_dup, libcurl), Ptr{CURLU}, (Ptr{CURLU},), in)
+    @ccall libcurl.curl_url_dup(in::Ptr{CURLU})::Ptr{CURLU}
 end
 
 function curl_url_get(handle, what, part, flags)
-    ccall((:curl_url_get, libcurl), CURLUcode, (Ptr{CURLU}, CURLUPart, Ptr{Ptr{Cchar}}, Cuint), handle, what, part, flags)
+    @ccall libcurl.curl_url_get(handle::Ptr{CURLU}, what::CURLUPart, part::Ptr{Ptr{Cchar}}, flags::Cuint)::CURLUcode
 end
 
 function curl_url_set(handle, what, part, flags)
-    ccall((:curl_url_set, libcurl), CURLUcode, (Ptr{CURLU}, CURLUPart, Ptr{Cchar}, Cuint), handle, what, part, flags)
+    @ccall libcurl.curl_url_set(handle::Ptr{CURLU}, what::CURLUPart, part::Ptr{Cchar}, flags::Cuint)::CURLUcode
 end
 
 @enum curl_easytype::UInt32 begin
@@ -1492,15 +1487,15 @@ mutable struct curl_easyoption
 end
 
 function curl_easy_option_by_name(name)
-    ccall((:curl_easy_option_by_name, libcurl), Ptr{curl_easyoption}, (Ptr{Cchar},), name)
+    @ccall libcurl.curl_easy_option_by_name(name::Ptr{Cchar})::Ptr{curl_easyoption}
 end
 
 function curl_easy_option_by_id(id)
-    ccall((:curl_easy_option_by_id, libcurl), Ptr{curl_easyoption}, (CURLoption,), id)
+    @ccall libcurl.curl_easy_option_by_id(id::CURLoption)::Ptr{curl_easyoption}
 end
 
 function curl_easy_option_next(prev)
-    ccall((:curl_easy_option_next, libcurl), Ptr{curl_easyoption}, (Ptr{curl_easyoption},), prev)
+    @ccall libcurl.curl_easy_option_next(prev::Ptr{curl_easyoption})::Ptr{curl_easyoption}
 end
 
 struct __JL_Ctag_54
@@ -1532,7 +1527,6 @@ mutable struct __JL_Ctag_55
     target::Ptr{Cchar}
     __JL_Ctag_55() = new()
 end
-
 function Base.getproperty(x::Ptr{__JL_Ctag_55}, f::Symbol)
     f === :time && return Ptr{Ptr{Cchar}}(x + 0)
     f === :perm && return Ptr{Ptr{Cchar}}(x + 4)
@@ -1552,6 +1546,7 @@ end
 function Base.setproperty!(x::Ptr{__JL_Ctag_55}, f::Symbol, v)
     unsafe_store!(getproperty(x, f), v)
 end
+
 
 const LIBCURL_COPYRIGHT = "1996 - 2020 Daniel Stenberg, <daniel@haxx.se>."
 
