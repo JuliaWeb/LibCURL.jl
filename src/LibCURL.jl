@@ -30,6 +30,9 @@ macro enum(decl::Expr, body::Expr)
     esc(res)
 end
 
+to_c_type(::Type{<:AbstractString}) = Cstring
+to_c_type(t::Type{<:Union{Array,Ref}}) = Ptr{eltype(t)}
+
 const IS_LIBC_MUSL = occursin("musl", Sys.MACHINE)
 
 if Sys.isapple() && Sys.ARCH === :aarch64
