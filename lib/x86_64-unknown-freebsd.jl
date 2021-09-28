@@ -3,18 +3,27 @@ to_c_type_pairs(va_list) = map(enumerate(to_c_type.(va_list))) do (ind, type)
     :(va_list[$ind]::$type)
 end
 
-const time_t = Clong
+const __time_t = Int64
+
+const __sa_family_t = UInt8
+
+const __socklen_t = UInt32
+
+const time_t = __time_t
+
+const __fd_mask = Culong
 
 mutable struct fd_set
-    fds_bits::NTuple{32, Culong}
+    __fds_bits::NTuple{16, __fd_mask}
     fd_set() = new()
 end
 
-const socklen_t = Cuint
+const sa_family_t = __sa_family_t
 
-const sa_family_t = Cushort
+const socklen_t = __socklen_t
 
 struct sockaddr
+    sa_len::Cuchar
     sa_family::sa_family_t
     sa_data::NTuple{14, Cchar}
 end
@@ -51,7 +60,7 @@ end
 
 const curl_socklen_t = socklen_t
 
-const curl_off_t = Clonglong
+const curl_off_t = Clong
 
 const CURL = Cvoid
 
@@ -118,53 +127,53 @@ const CURLFILETYPE_SOCKET = 6 % UInt32
 const CURLFILETYPE_DOOR = 7 % UInt32
 const CURLFILETYPE_UNKNOWN = 8 % UInt32
 
-mutable struct __JL_Ctag_48
+mutable struct __JL_Ctag_41
     time::Ptr{Cchar}
     perm::Ptr{Cchar}
     user::Ptr{Cchar}
     group::Ptr{Cchar}
     target::Ptr{Cchar}
-    __JL_Ctag_48() = new()
+    __JL_Ctag_41() = new()
 end
-function Base.getproperty(x::Ptr{__JL_Ctag_48}, f::Symbol)
+function Base.getproperty(x::Ptr{__JL_Ctag_41}, f::Symbol)
     f === :time && return Ptr{Ptr{Cchar}}(x + 0)
-    f === :perm && return Ptr{Ptr{Cchar}}(x + 4)
-    f === :user && return Ptr{Ptr{Cchar}}(x + 8)
-    f === :group && return Ptr{Ptr{Cchar}}(x + 12)
-    f === :target && return Ptr{Ptr{Cchar}}(x + 16)
+    f === :perm && return Ptr{Ptr{Cchar}}(x + 8)
+    f === :user && return Ptr{Ptr{Cchar}}(x + 16)
+    f === :group && return Ptr{Ptr{Cchar}}(x + 24)
+    f === :target && return Ptr{Ptr{Cchar}}(x + 32)
     return getfield(x, f)
 end
 
-function Base.getproperty(x::__JL_Ctag_48, f::Symbol)
-    r = Ref{__JL_Ctag_48}(x)
-    ptr = Base.unsafe_convert(Ptr{__JL_Ctag_48}, r)
+function Base.getproperty(x::__JL_Ctag_41, f::Symbol)
+    r = Ref{__JL_Ctag_41}(x)
+    ptr = Base.unsafe_convert(Ptr{__JL_Ctag_41}, r)
     fptr = getproperty(ptr, f)
     GC.@preserve r unsafe_load(fptr)
 end
 
-function Base.setproperty!(x::Ptr{__JL_Ctag_48}, f::Symbol, v)
+function Base.setproperty!(x::Ptr{__JL_Ctag_41}, f::Symbol, v)
     unsafe_store!(getproperty(x, f), v)
 end
 
 
 struct curl_fileinfo
-    data::NTuple{72, UInt8}
+    data::NTuple{128, UInt8}
 end
 
 function Base.getproperty(x::Ptr{curl_fileinfo}, f::Symbol)
     f === :filename && return Ptr{Ptr{Cchar}}(x + 0)
-    f === :filetype && return Ptr{curlfiletype}(x + 4)
-    f === :time && return Ptr{time_t}(x + 8)
-    f === :perm && return Ptr{Cuint}(x + 12)
-    f === :uid && return Ptr{Cint}(x + 16)
-    f === :gid && return Ptr{Cint}(x + 20)
-    f === :size && return Ptr{curl_off_t}(x + 24)
-    f === :hardlinks && return Ptr{Clong}(x + 32)
-    f === :strings && return Ptr{__JL_Ctag_48}(x + 36)
-    f === :flags && return Ptr{Cuint}(x + 56)
-    f === :b_data && return Ptr{Ptr{Cchar}}(x + 60)
-    f === :b_size && return Ptr{Csize_t}(x + 64)
-    f === :b_used && return Ptr{Csize_t}(x + 68)
+    f === :filetype && return Ptr{curlfiletype}(x + 8)
+    f === :time && return Ptr{time_t}(x + 16)
+    f === :perm && return Ptr{Cuint}(x + 24)
+    f === :uid && return Ptr{Cint}(x + 28)
+    f === :gid && return Ptr{Cint}(x + 32)
+    f === :size && return Ptr{curl_off_t}(x + 40)
+    f === :hardlinks && return Ptr{Clong}(x + 48)
+    f === :strings && return Ptr{__JL_Ctag_41}(x + 56)
+    f === :flags && return Ptr{Cuint}(x + 96)
+    f === :b_data && return Ptr{Ptr{Cchar}}(x + 104)
+    f === :b_size && return Ptr{Csize_t}(x + 112)
+    f === :b_used && return Ptr{Csize_t}(x + 120)
     return getfield(x, f)
 end
 
@@ -758,7 +767,7 @@ const CURLOPT_PROXY_ISSUERCERT_BLOB = 40297 % UInt32
 const CURLOPT_SSL_EC_CURVES = 10298 % UInt32
 const CURLOPT_LASTENTRY = 10299 % UInt32
 
-const __JL_Ctag_26 = UInt32
+const __JL_Ctag_19 = UInt32
 const CURL_HTTP_VERSION_NONE = 0 % UInt32
 const CURL_HTTP_VERSION_1_0 = 1 % UInt32
 const CURL_HTTP_VERSION_1_1 = 2 % UInt32
@@ -768,7 +777,7 @@ const CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE = 5 % UInt32
 const CURL_HTTP_VERSION_3 = 30 % UInt32
 const CURL_HTTP_VERSION_LAST = 31 % UInt32
 
-const __JL_Ctag_27 = UInt32
+const __JL_Ctag_20 = UInt32
 const CURL_RTSPREQ_NONE = 0 % UInt32
 const CURL_RTSPREQ_OPTIONS = 1 % UInt32
 const CURL_RTSPREQ_DESCRIBE = 2 % UInt32
@@ -789,7 +798,7 @@ const CURL_NETRC_OPTIONAL = 1 % UInt32
 const CURL_NETRC_REQUIRED = 2 % UInt32
 const CURL_NETRC_LAST = 3 % UInt32
 
-const __JL_Ctag_28 = UInt32
+const __JL_Ctag_21 = UInt32
 const CURL_SSLVERSION_DEFAULT = 0 % UInt32
 const CURL_SSLVERSION_TLSv1 = 1 % UInt32
 const CURL_SSLVERSION_SSLv2 = 2 % UInt32
@@ -800,7 +809,7 @@ const CURL_SSLVERSION_TLSv1_2 = 6 % UInt32
 const CURL_SSLVERSION_TLSv1_3 = 7 % UInt32
 const CURL_SSLVERSION_LAST = 8 % UInt32
 
-const __JL_Ctag_29 = UInt32
+const __JL_Ctag_22 = UInt32
 const CURL_SSLVERSION_MAX_NONE = 0 % UInt32
 const CURL_SSLVERSION_MAX_DEFAULT = 65536 % UInt32
 const CURL_SSLVERSION_MAX_TLSv1_0 = 262144 % UInt32
@@ -1263,35 +1272,35 @@ const CURLMSG_NONE = 0 % UInt32
 const CURLMSG_DONE = 1 % UInt32
 const CURLMSG_LAST = 2 % UInt32
 
-struct __JL_Ctag_47
-    data::NTuple{4, UInt8}
+struct __JL_Ctag_40
+    data::NTuple{8, UInt8}
 end
 
-function Base.getproperty(x::Ptr{__JL_Ctag_47}, f::Symbol)
+function Base.getproperty(x::Ptr{__JL_Ctag_40}, f::Symbol)
     f === :whatever && return Ptr{Ptr{Cvoid}}(x + 0)
     f === :result && return Ptr{CURLcode}(x + 0)
     return getfield(x, f)
 end
 
-function Base.getproperty(x::__JL_Ctag_47, f::Symbol)
-    r = Ref{__JL_Ctag_47}(x)
-    ptr = Base.unsafe_convert(Ptr{__JL_Ctag_47}, r)
+function Base.getproperty(x::__JL_Ctag_40, f::Symbol)
+    r = Ref{__JL_Ctag_40}(x)
+    ptr = Base.unsafe_convert(Ptr{__JL_Ctag_40}, r)
     fptr = getproperty(ptr, f)
     GC.@preserve r unsafe_load(fptr)
 end
 
-function Base.setproperty!(x::Ptr{__JL_Ctag_47}, f::Symbol, v)
+function Base.setproperty!(x::Ptr{__JL_Ctag_40}, f::Symbol, v)
     unsafe_store!(getproperty(x, f), v)
 end
 
 struct CURLMsg
-    data::NTuple{12, UInt8}
+    data::NTuple{24, UInt8}
 end
 
 function Base.getproperty(x::Ptr{CURLMsg}, f::Symbol)
     f === :msg && return Ptr{CURLMSG}(x + 0)
-    f === :easy_handle && return Ptr{Ptr{CURL}}(x + 4)
-    f === :data && return Ptr{__JL_Ctag_47}(x + 8)
+    f === :easy_handle && return Ptr{Ptr{CURL}}(x + 8)
+    f === :data && return Ptr{__JL_Ctag_40}(x + 16)
     return getfield(x, f)
 end
 
@@ -1515,11 +1524,11 @@ const LIBCURL_VERSION_NUM = 0x00074900
 
 const LIBCURL_TIMESTAMP = "2020-10-14"
 
-const CURL_TYPEOF_CURL_OFF_T = Clonglong
+const CURL_TYPEOF_CURL_OFF_T = Clong
 
-const CURL_FORMAT_CURL_OFF_T = "lld"
+const CURL_FORMAT_CURL_OFF_T = "ld"
 
-const CURL_FORMAT_CURL_OFF_TU = "llu"
+const CURL_FORMAT_CURL_OFF_TU = "lu"
 
 const CURL_TYPEOF_CURL_SOCKLEN_T = socklen_t
 
