@@ -7,7 +7,6 @@ const CURL_SUFFIX_CURL_OFF_TU            = Culong
 const CURL_TYPEOF_CURL_SOCKLEN_T         = socklen_t
 const CURL_PULL_SYS_TYPES_H              = 1
 const CURL_PULL_SYS_SOCKET_H             = 1
-const CURL_SOCKET_BAD                    = -1
 const CURLSSLBACKEND_LIBRESSL            = CURLSSLBACKEND_OPENSSL
 const CURLSSLBACKEND_BORINGSSL           = CURLSSLBACKEND_OPENSSL
 const CURLSSLBACKEND_CYASSL              = CURLSSLBACKEND_WOLFSSL
