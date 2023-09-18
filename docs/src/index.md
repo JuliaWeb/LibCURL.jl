@@ -1,3 +1,7 @@
+```@meta
+EditURL = "https://github.com/JuliaWeb/LibCURL.jl/blob/master/docs/src/index.md"
+```
+
 # LibCURL
 
 This is a simple Julia wrapper around http://curl.haxx.se/libcurl/ generated using [Clang.jl](https://github.com/ihnorton/Clang.jl). 
