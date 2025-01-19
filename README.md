@@ -4,7 +4,7 @@ LibCURL.jl
 *Julia wrapper for libCURL*
 
 [![CI](https://github.com/JuliaWeb/LibCURL.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/JuliaWeb/LibCURL.jl/actions/workflows/ci.yml)
-[![codecov.io](http://codecov.io/github/JuliaWeb/LibCURL.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/LibCURL.jl?branch=master)
+[![codecov.io](https://codecov.io/github/JuliaWeb/LibCURL.jl/graph/badge.svg)](https://codecov.io/github/JuliaWeb/LibCURL.jl)
 
 ---
 This is a simple Julia wrapper around http://curl.haxx.se/libcurl/ generated using [Clang.jl](https://github.com/ihnorton/Clang.jl). Please see the [libcurl API documentation](https://curl.haxx.se/libcurl/c/) for help on how to use this package.
