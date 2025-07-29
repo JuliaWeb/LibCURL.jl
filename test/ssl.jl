@@ -23,7 +23,7 @@ const infotype_str = Dict(
 
 function curl_debug_cb(handle::Ptr{Cvoid}, type::Cint, data::Ptr{Cvoid}, sz::Csize_t, clientp::Ptr{Cvoid})
     debug_buffer = unsafe_pointer_to_objref(clientp)::IOBuffer
-    data = UInt8[unsafe_load(reinterpret(Ptr{Cuchar}, data), n) for n in 1:sz]
+    data = unsafe_wrap(Array, reinterpret(Ptr{UInt8}, data), sz)
     println(debug_buffer, "$(infotype_str[type]) \"$(String(data))\"")
     return Cint(0)
 end
