@@ -3,8 +3,13 @@
 const CURL = Cvoid
 const CURLSH = Cvoid
 
-const curl_socket_t = Cint
-const CURL_SOCKET_BAD = -1
+if Sys.iswindows()
+    const curl_socket_t = Base.OS_HANDLE
+    const CURL_SOCKET_BAD = Base.INVALID_OS_HANDLE
+else
+    const curl_socket_t = Cint
+    const CURL_SOCKET_BAD = -1
+end
 
 # begin enum curl_sslbackend
 const curl_sslbackend = UInt32
