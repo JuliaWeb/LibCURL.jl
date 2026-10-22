@@ -1021,10 +1021,17 @@ const CURLVERSION_SECOND = (UInt32)(1)
 const CURLVERSION_THIRD = (UInt32)(2)
 const CURLVERSION_FOURTH = (UInt32)(3)
 const CURLVERSION_FIFTH = (UInt32)(4)
-const CURLVERSION_LAST = (UInt32)(5)
+const CURLVERSION_SIXTH = (UInt32)(5)
+const CURLVERSION_SEVENTH = (UInt32)(6)
+const CURLVERSION_EIGHTH = (UInt32)(7)
+const CURLVERSION_NINTH = (UInt32)(8)
+const CURLVERSION_TENTH = (UInt32)(9)
+const CURLVERSION_ELEVENTH = (UInt32)(10)
+const CURLVERSION_TWELFTH = (UInt32)(11)
+const CURLVERSION_LAST = (UInt32)(12)
 # end enum CURLversion
 
-const CURLVERSION_NOW = CURLVERSION_FIFTH
+const CURLVERSION_NOW = CURLVERSION_TWELFTH
 
 mutable struct curl_version_info_data
     age::CURLversion
@@ -1033,7 +1040,7 @@ mutable struct curl_version_info_data
     host::Ptr{UInt8}
     features::Int32
     ssl_version::Ptr{UInt8}
-    ssl_version_num::Int32
+    ssl_version_num::Clong
     libz_version::Ptr{UInt8}
     protocols::Ptr{Ptr{UInt8}}
     ares::Ptr{UInt8}
@@ -1043,6 +1050,17 @@ mutable struct curl_version_info_data
     libssh_version::Ptr{UInt8}
     brotli_ver_num::UInt32
     brotli_version::Ptr{UInt8}
+    nghttp2_ver_num::UInt32
+    nghttp2_version::Ptr{UInt8}
+    quic_version::Ptr{UInt8}
+    cainfo::Ptr{UInt8}
+    capath::Ptr{UInt8}
+    zstd_ver_num::UInt32
+    zstd_version::Ptr{UInt8}
+    hyper_version::Ptr{UInt8}
+    gsasl_version::Ptr{UInt8}
+    feature_names::Ptr{Ptr{UInt8}}
+    rtmp_version::Ptr{UInt8}
 end
 
 const CURL_VERSION_IPV6 = 1 << 0

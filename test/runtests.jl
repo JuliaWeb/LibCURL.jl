@@ -24,6 +24,22 @@ using Downloads: download
         curl_easy_cleanup(curl)
     end
 
+    @testset "version info" begin
+        info = unsafe_load(curl_version_info(CURLVERSION_NOW))
+        @test info.age >= CURLVERSION_ELEVENTH
+        @test startswith(unsafe_string(curl_version()), "libcurl/" * unsafe_string(info.version))
+        @test unsafe_string(info.ssl_version) != ""
+        names = String[]
+        i = 1
+        while (name = unsafe_load(info.feature_names, i)) != C_NULL
+            push!(names, unsafe_string(name))
+            i += 1
+        end
+        @test "SSL" in names
+        @test ("libz" in names) == (info.libz_version != C_NULL)
+        @test ("zstd" in names) == (info.zstd_version != C_NULL)
+    end
+
     @testset "download" begin
         curl = curl_easy_init()
         curl == C_NULL && error("curl_easy_init() failed")
