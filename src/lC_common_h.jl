@@ -60,6 +60,9 @@ const CURL_MAX_WRITE_SIZE = 16384
 const CURL_MAX_HTTP_HEADER = 100 * 1024
 const CURL_WRITEFUNC_PAUSE = 0x10000001
 
+# Returned by a progress or xferinfo callback to let libcurl also run its built-in progress meter.
+const CURL_PROGRESSFUNC_CONTINUE = 0x10000001
+
 const curl_write_callback = Ptr{Cvoid}
 const curl_resolver_start_callback = Ptr{Cvoid}
 

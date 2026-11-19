@@ -65,6 +65,7 @@ export curl_pushheader_byname
 export CURL
 export CURLSH
 export curl_socket_t
+export curl_off_t
 export CURL_SOCKET_BAD
 export curl_sslbackend
 export CURLSSLBACKEND_NONE
@@ -96,6 +97,7 @@ export CURL_MAX_READ_SIZE
 export CURL_MAX_WRITE_SIZE
 export CURL_MAX_HTTP_HEADER
 export CURL_WRITEFUNC_PAUSE
+export CURL_PROGRESSFUNC_CONTINUE
 export curl_write_callback
 export curl_resolver_start_callback
 export CURLFINFOFLAG_KNOWN_FILENAME
